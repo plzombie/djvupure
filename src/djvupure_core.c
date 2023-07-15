@@ -58,6 +58,16 @@ DJVUPURE_API bool DJVUPURE_APIENTRY_EXPORT djvupureChunkRender(djvupure_chunk_t 
 	if(chunk->hash != djvupureChunkGetStructHash()) return false;
 	
 	chunk_start = io->callback_tell(fctx);
+
+	if(chunk_start % 2) {
+		uint8_t dummy[1] = { 0 };
+
+		if(chunk_start >= INT64_MAX) return false;
+
+		chunk_start++;
+
+		if(io->callback_write(fctx, dummy, 1) != 1) return false;
+	}
 	
 	if(io->callback_write(fctx, chunk->sign, 4) != 4) return false;
 	if(io->callback_write(fctx, chunk_len_be4, 4) != 4) return false;
@@ -78,11 +88,6 @@ DJVUPURE_API bool DJVUPURE_APIENTRY_EXPORT djvupureChunkRender(djvupure_chunk_t 
 	if(io->callback_seek(fctx, chunk_start+4, DJVUPURE_IO_SEEK_SET)) return false;
 	if(io->callback_write(fctx, chunk_len_be4, 4) != 4) return false;
 	if(io->callback_seek(fctx, chunk_end, DJVUPURE_IO_SEEK_SET)) return false;
-	if(chunk_len % 2) {
-		uint8_t dummy[1] = { 0 };
-
-		if(io->callback_write(fctx, dummy, 1) != 1) return false;
-	}
 	
 	return result;
 }

@@ -122,10 +122,17 @@ DJVUPURE_API djvupure_chunk_t * DJVUPURE_APIENTRY_EXPORT djvupureContainerRead(d
 	chunk_end += chunk_len;
 	
 	while(io->callback_tell(fctx) < chunk_end) {
+		uint8_t sign[4];
 		djvupure_chunk_t *subchunk;
 		size_t index;
+
+		if(io->callback_read(fctx, sign, 4) != 4) goto FAILURE;
+		if(io->callback_seek(fctx, -4, DJVUPURE_IO_SEEK_CUR)) goto FAILURE;
 		
-		subchunk = djvupureRawChunkRead(io, fctx);
+		if(djvupureContainerCheckSign(sign))
+			subchunk = djvupureContainerRead(io, fctx);
+		else
+			subchunk = djvupureRawChunkRead(io, fctx);
 		if(!subchunk) goto FAILURE;
 		
 		index = djvupureContainerSize(container);
