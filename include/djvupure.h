@@ -112,8 +112,10 @@ DJVUPURE_API void DJVUPURE_APIENTRY_EXPORT djvupureFileSetIoCallbacks(djvupure_i
 
 DJVUPURE_API djvupure_chunk_t * DJVUPURE_APIENTRY_EXPORT djvupureRawChunkCreate(const uint8_t sign[4], void *data, size_t data_len);
 DJVUPURE_API djvupure_chunk_t * DJVUPURE_APIENTRY_EXPORT djvupureRawChunkRead(djvupure_io_callback_t *io, void *fctx);
+DJVUPURE_API void DJVUPURE_APIENTRY_EXPORT djvupureRawChunkGetDataPointer(djvupure_chunk_t *chunk, void **data, size_t *data_len);
 
-DJVUPURE_API bool DJVUPURE_APIENTRY_EXPORT djvupureContainerCheckSign(uint8_t sign[4]);
+DJVUPURE_API bool DJVUPURE_APIENTRY_EXPORT djvupureContainerCheckSign(const uint8_t sign[4]);
+DJVUPURE_API bool DJVUPURE_APIENTRY_EXPORT djvupureContainerIs(djvupure_chunk_t *container, const uint8_t subsign[4]);
 DJVUPURE_API djvupure_chunk_t * DJVUPURE_APIENTRY_EXPORT djvupureContainerCreate(const uint8_t subsign[4]);
 DJVUPURE_API djvupure_chunk_t * DJVUPURE_APIENTRY_EXPORT djvupureContainerRead(djvupure_io_callback_t *io, void *fctx);
 DJVUPURE_API bool DJVUPURE_APIENTRY_EXPORT djvupureContainerInsertChunk(djvupure_chunk_t *container, djvupure_chunk_t *chunk, size_t index);

@@ -32,12 +32,25 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 static const uint8_t djvupure_form_sign[4] = { 'F', 'O', 'R', 'M' };
 
-DJVUPURE_API bool DJVUPURE_APIENTRY_EXPORT djvupureContainerCheckSign(uint8_t sign[4])
+DJVUPURE_API bool DJVUPURE_APIENTRY_EXPORT djvupureContainerCheckSign(const uint8_t sign[4])
 {
 	if(!memcmp(sign, djvupure_form_sign, 4))
 		return true;
 	else
 		return false;
+}
+
+DJVUPURE_API bool DJVUPURE_APIENTRY_EXPORT djvupureContainerIs(djvupure_chunk_t *container, const uint8_t subsign[4])
+{
+	if(!djvupureContainerCheckSign(container->sign)) return false;
+
+	if(subsign) {
+		if(container->ctx == 0) return false;
+
+		if(memcmp(container->ctx, subsign, 4)) return false;
+	}
+
+	return true;
 }
 
 static void DJVUPURE_APIENTRY djvupureContainerCallbackFree(void *ctx)

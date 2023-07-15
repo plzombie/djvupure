@@ -125,3 +125,14 @@ FAILURE:
 	
 	return 0;
 }
+
+DJVUPURE_API void DJVUPURE_APIENTRY_EXPORT djvupureRawChunkGetDataPointer(djvupure_chunk_t *chunk, void **data, size_t *data_len)
+{
+	*data = 0;
+	*data_len = 0;
+
+	if(chunk->hash != djvupureChunkGetStructHash()) return;
+
+	*data_len = *((size_t *)(chunk->ctx));
+	*data = (void *)((uintptr_t)(chunk->ctx)+sizeof(size_t));
+}

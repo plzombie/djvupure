@@ -33,7 +33,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 djvupure_chunk_t * CreateInfoChunkFromParams(wchar_t *params);
 djvupure_chunk_t * CreateRawChunkFromFile(uint8_t sign[4], wchar_t *chunk_filename);
-
+void CreateIW44ChunkFromFile(djvupure_chunk_t *page, uint8_t sign[4], wchar_t *chunk_filename, size_t chunks_to_copy);
 int wmain(int argc, wchar_t **argv)
 {
 	djvupure_io_callback_t io;
@@ -54,7 +54,10 @@ int wmain(int argc, wchar_t **argv)
 			L"\tfor INFO chunk there are special parameters \"INFO=width,height,dpi,rotation,gamma\", some parameters can be empty\n"
 			L"\t\trotation 1 is 0deg, 5 - 90deg, 2 - 180deg, 6 - 270deg\n"
 			L"\t\tgamma 22 stands for gamma value 2.2\n"
-			L"\tfor other chunks parameter is a path to a file containing chunk data (i.e. \"Sjbz=page.sjbz\")\n",
+			L"\tfor other chunks parameter is a path to a file containing chunk data (i.e. \"Sjbz=page.sjbz\")\n"
+			L"\tChunks FG44 and BG44 should be a IFF85 file with a group of PM44 subchunks (can be created with extract utility)\n"
+			L"\t\tchunk FG44 extracts only one PM44 chunk from file\n"
+			L"\t\tchunk BG44 can be defined like \"BG44=file.bg44,n\" where n is a number of chunks to copy",
 			command);
 
 		return EXIT_SUCCESS;
@@ -88,6 +91,24 @@ int wmain(int argc, wchar_t **argv)
 
 		if(!memcmp(sign, "INFO", 4)) { // Process INFO chunk
 			chunk = CreateInfoChunkFromParams(chunk_filename);
+		} else if(!memcmp(sign, "FG44", 4)) { // Process FG44 chunk
+			CreateIW44ChunkFromFile(page, "FG44", chunk_filename, 1);
+
+			continue;
+		} else if(!memcmp(sign, "BG44", 4)) { // Process BG44 chunk
+			size_t n = 0;
+			wchar_t *p;
+			
+			p = wcsrchr(chunk_filename, ',');
+			if(p) {
+				*p = 0;
+				p++;
+				n = _wtoi(p);
+			}
+
+			CreateIW44ChunkFromFile(page, "BG44", chunk_filename, n);
+
+			continue;
 		} else { // Process others
 			chunk = CreateRawChunkFromFile(sign, chunk_filename);
 		}
@@ -229,4 +250,73 @@ FINAL:
 	if(chunk_data) free(chunk_data);
 
 	return chunk;
+}
+
+void CreateIW44ChunkFromFile(djvupure_chunk_t *page, uint8_t sign[4], wchar_t *chunk_filename, size_t chunks_to_copy)
+{
+	djvupure_io_callback_t io;
+	djvupure_chunk_t *chunk = 0, *pm44 = 0;
+	void *fctx = 0;
+	size_t nof_pm44_subchunks;
+	const uint8_t pm44_sign[4] = { 'P', 'M', '4', '4' };
+
+	djvupureFileSetIoCallbacks(&io);
+
+	fctx = djvupureFileOpenW(chunk_filename, false);
+	if(!fctx) {
+		wprintf(L"Can't open file \"%ls\" for chunk\n", chunk_filename);
+
+		goto FINAL;
+	}
+
+	pm44 = djvupureContainerRead(&io, fctx);
+	if(!pm44) {
+		wprintf(L"Can't open file \"%ls\" for chunk\n", chunk_filename);
+
+		goto FINAL;
+	}
+
+	if(!djvupureContainerIs(pm44, pm44_sign)) {
+		wprintf(L"File \"%ls\" is not a IFF85 PM44 file\n", chunk_filename);
+
+		goto FINAL;
+	}
+
+	nof_pm44_subchunks = djvupureContainerSize(pm44);
+	if(chunks_to_copy == 0) chunks_to_copy = nof_pm44_subchunks;
+
+	for(size_t i = 0; i < nof_pm44_subchunks && chunks_to_copy > 0; i++) {
+		djvupure_chunk_t *subchunk, *iw44;
+		void *data;
+		size_t data_len, page_subindex;
+
+		subchunk = djvupureContainerGetSubchunk(pm44, i);
+		if(!subchunk) continue;
+
+		if(memcmp(subchunk->sign, pm44_sign, 4)) continue;
+
+		djvupureRawChunkGetDataPointer(subchunk, &data, &data_len);
+
+		iw44 = djvupureRawChunkCreate(sign, data, data_len);
+		if(!iw44) {
+			wprintf(L"Can't append chunk %.4hs\n", sign);
+
+			continue;
+		}
+
+		page_subindex = djvupureContainerSize(page);
+		if(!djvupureContainerInsertChunk(page, iw44, page_subindex)) {
+			wprintf(L"Can't append chunk %.4hs\n", sign);
+			djvupureChunkFree(iw44);
+
+			continue;
+		}
+
+		chunks_to_copy--;
+	}
+
+FINAL:
+	if(fctx) djvupureFileClose(fctx);
+	if(pm44) djvupureChunkFree(pm44);
+	if(chunk) djvupureChunkFree(chunk);
 }
