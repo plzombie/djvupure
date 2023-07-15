@@ -85,6 +85,14 @@ typedef struct {
 	djvupure_chunk_callback_render_t callback_render;
 } djvupure_chunk_t;
 
+typedef struct {
+	uint16_t width;
+	uint16_t height;
+	uint16_t dpi;
+	uint8_t gamma; // Defaults to 22
+	uint8_t rotation; // 1 - without, 5 - 90deg, 2 - 180deg, 6 - 270deg
+} djvupure_page_info_t;
+
 #ifdef __cplusplus
 }
 #endif
@@ -102,15 +110,21 @@ DJVUPURE_API void * DJVUPURE_APIENTRY_EXPORT djvupureFileOpenW(wchar_t *filename
 DJVUPURE_API void DJVUPURE_APIENTRY_EXPORT djvupureFileClose(void *fctx);
 DJVUPURE_API void DJVUPURE_APIENTRY_EXPORT djvupureFileSetIoCallbacks(djvupure_io_callback_t *io);
 
+DJVUPURE_API djvupure_chunk_t * DJVUPURE_APIENTRY_EXPORT djvupureRawChunkCreate(const uint8_t sign[4], void *data, size_t data_len);
 DJVUPURE_API djvupure_chunk_t * DJVUPURE_APIENTRY_EXPORT djvupureRawChunkRead(djvupure_io_callback_t *io, void *fctx);
 
 DJVUPURE_API bool DJVUPURE_APIENTRY_EXPORT djvupureContainerCheckSign(uint8_t sign[4]);
+DJVUPURE_API djvupure_chunk_t * DJVUPURE_APIENTRY_EXPORT djvupureContainerCreate(const uint8_t subsign[4]);
 DJVUPURE_API djvupure_chunk_t * DJVUPURE_APIENTRY_EXPORT djvupureContainerRead(djvupure_io_callback_t *io, void *fctx);
 DJVUPURE_API bool DJVUPURE_APIENTRY_EXPORT djvupureContainerInsertChunk(djvupure_chunk_t *container, djvupure_chunk_t *chunk, size_t index);
 DJVUPURE_API size_t DJVUPURE_APIENTRY_EXPORT djvupureContainerSize(djvupure_chunk_t *container);
 DJVUPURE_API djvupure_chunk_t * DJVUPURE_APIENTRY_EXPORT djvupureContainerGetSubchunk(djvupure_chunk_t *container, size_t index);
 
-DJVUPURE_API djvupure_chunk_t * DJVUPURE_APIENTRY_EXPORT djvuDocumentRead(djvupure_io_callback_t *io, void *fctx);
+DJVUPURE_API djvupure_chunk_t * DJVUPURE_APIENTRY_EXPORT djvupureInfoCreate(djvupure_page_info_t info);
+
+DJVUPURE_API djvupure_chunk_t * DJVUPURE_APIENTRY_EXPORT djvupurePageCreate(void);
+
+DJVUPURE_API djvupure_chunk_t * DJVUPURE_APIENTRY_EXPORT djvupureDocumentRead(djvupure_io_callback_t *io, void *fctx);
 DJVUPURE_API bool DJVUPURE_APIENTRY_EXPORT djvupureDocumentRender(djvupure_chunk_t *chunk, djvupure_io_callback_t *io, void *fctx);
 
 #endif

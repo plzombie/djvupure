@@ -83,6 +83,32 @@ static bool DJVUPURE_APIENTRY djvupureContainerCallbackRender(void *ctx, djvupur
 	return true;
 }
 
+DJVUPURE_API djvupure_chunk_t * DJVUPURE_APIENTRY_EXPORT djvupureContainerCreate(const uint8_t subsign[4])
+{
+	djvupure_chunk_t *container = 0;
+	size_t ctx_size;
+	
+	container = malloc(sizeof(djvupure_chunk_t));
+	if(!container) return 0;
+	
+	container->callback_free = djvupureContainerCallbackFree;
+	container->callback_render = djvupureContainerCallbackRender;
+	container->hash = djvupureChunkGetStructHash();
+	ctx_size = 4+4+sizeof(size_t)*2;
+	container->ctx = malloc(ctx_size);
+	if(!container->ctx) {
+		free(container);
+		
+		return 0;
+	}
+	memset(container->ctx, 0, 4+4+sizeof(size_t)*2);
+	
+	memcpy(container->sign, djvupure_form_sign, 4);
+	memcpy(container->ctx, subsign, 4);
+	
+	return container;
+}
+
 DJVUPURE_API djvupure_chunk_t * DJVUPURE_APIENTRY_EXPORT djvupureContainerRead(djvupure_io_callback_t *io, void *fctx)
 {
 	djvupure_chunk_t *container = 0;

@@ -27,23 +27,31 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "../include/djvupure.h"
 
-#include <string.h>
+static const uint8_t djvupure_info_sign[4] = { 'I', 'N', 'F', 'O' };
 
-DJVUPURE_API djvupure_chunk_t * DJVUPURE_APIENTRY_EXPORT djvupureDocumentRead(djvupure_io_callback_t *io, void *fctx)
+DJVUPURE_API djvupure_chunk_t * DJVUPURE_APIENTRY_EXPORT djvupureInfoCreate(djvupure_page_info_t info)
 {
-	uint8_t atnt_sign[4] = { 'A', 'T', '&', 'T' }, sign[4];
+	uint8_t chunk_data[10];
 	
-	if(io->callback_read(fctx, sign, 4) != 4) return 0;
-	if(memcmp(sign, atnt_sign, 4)) return 0;
+	chunk_data[0] = info.width/256;
+	chunk_data[1] = info.width%256;
+	chunk_data[2] = info.height/256;
+	chunk_data[3] = info.height%256;
+	chunk_data[4] = 26; // Minor version
+	chunk_data[5] = 0; // Major version
+	chunk_data[6] = info.dpi%256;
+	chunk_data[7] = info.dpi/256;
+	chunk_data[8] = info.gamma;
+	switch(info.rotation) {
+		case 1:
+		case 2:
+		case 5:
+		case 6:
+			chunk_data[9] = info.rotation;
+			break;
+		default:
+			chunk_data[9] = 1;
+	}
 	
-	return djvupureContainerRead(io, fctx);
-}
-
-DJVUPURE_API bool DJVUPURE_APIENTRY_EXPORT djvupureDocumentRender(djvupure_chunk_t *chunk, djvupure_io_callback_t *io, void *fctx)
-{
-	uint8_t atnt_sign[4] = { 'A', 'T', '&', 'T' };
-	
-	if(io->callback_write(fctx, atnt_sign, 4) != 4) return false;
-	
-	return djvupureChunkRender(chunk, io, fctx);
+	return djvupureRawChunkCreate(djvupure_info_sign, &chunk_data, 10);
 }

@@ -28,6 +28,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "../include/djvupure.h"
 
 #include <stdlib.h>
+#include <string.h>
 
 static void DJVUPURE_APIENTRY djvupureRawChunkCallbackFree(void *ctx)
 {
@@ -49,6 +50,35 @@ static bool DJVUPURE_APIENTRY djvupureRawChunkCallbackRender(void *ctx, djvupure
 	if(io->callback_write(fctx, (void *)(uctx+sizeof(size_t)), chunk_len) != chunk_len) return false;
 	
 	return true;
+}
+
+DJVUPURE_API djvupure_chunk_t * DJVUPURE_APIENTRY_EXPORT djvupureRawChunkCreate(const uint8_t sign[4], void *data, size_t data_len)
+{
+	djvupure_chunk_t *chunk = 0;
+	uintptr_t uctx;
+	
+	if(data_len > SIZE_MAX-sizeof(size_t)) return 0;
+	
+	chunk = malloc(sizeof(djvupure_chunk_t));
+	if(!chunk) return 0;
+	chunk->callback_free = djvupureRawChunkCallbackFree;
+	chunk->callback_render = djvupureRawChunkCallbackRender;
+	chunk->hash = djvupureChunkGetStructHash();
+	chunk->ctx = 0;
+	memcpy(chunk->sign, sign, 4);
+	
+	chunk->ctx = malloc(data_len+sizeof(size_t));
+	if(!chunk->ctx) {
+		free(chunk);
+		
+		return 0;
+	}
+	
+	uctx = (uintptr_t)(chunk->ctx);
+	*((size_t *)(chunk->ctx)) = data_len;
+	memcpy((void *)(uctx+sizeof(size_t)), data, data_len);
+	
+	return chunk;
 }
 
 DJVUPURE_API djvupure_chunk_t * DJVUPURE_APIENTRY_EXPORT djvupureRawChunkRead(djvupure_io_callback_t *io, void *fctx)

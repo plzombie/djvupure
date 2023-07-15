@@ -52,9 +52,13 @@ int wmain(int argc, wchar_t **argv)
 #endif
 
 	if(argc <= 1) {
-		wchar_t *command;
+		wchar_t *command, *_command;
 		
 		command = argv[0];
+		_command = wcsrchr(command, '\\');
+		if(_command) command = _command+1;
+		_command = wcsrchr(command, '/');
+		if(_command) command = _command+1;
 		
 		wprintf(L"%ls filename.djvu\n"
 			L"\tprints filename.djvu content with a tree\n",
@@ -76,7 +80,7 @@ int wmain(int argc, wchar_t **argv)
 	
 	djvupureFileSetIoCallbacks(&io);
 	
-	document = djvuDocumentRead(&io, fctx);
+	document = djvupureDocumentRead(&io, fctx);
 	djvupureFileClose(fctx);
 	if(!document) {
 		wprintf(L"Can't open document\n");
