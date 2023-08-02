@@ -15,7 +15,7 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\src\tools\djvupuremake.c">
+    <ClCompile Include="..\..\src\tools\djvupureinsert.c">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\tools\aux_create.c">

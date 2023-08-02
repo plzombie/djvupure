@@ -37,8 +37,8 @@
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
-    <ProjectGuid>{8379a7b8-1af4-4906-9d69-3c8134e03de5}</ProjectGuid>
-    <RootNamespace>djvupuremake</RootNamespace>
+    <ProjectGuid>{b9d9240f-4941-4d26-b074-544c50dbea27}</ProjectGuid>
+    <RootNamespace>djvupureinsert</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
@@ -271,7 +271,7 @@
   <ItemGroup>
     <ClCompile Include="..\..\src\tools\aux_create.c" />
     <ClCompile Include="..\..\src\tools\aux_insert.c" />
-    <ClCompile Include="..\..\src\tools\djvupuremake.c" />
+    <ClCompile Include="..\..\src\tools\djvupureinsert.c" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

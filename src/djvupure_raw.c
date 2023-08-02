@@ -94,6 +94,9 @@ DJVUPURE_API djvupure_chunk_t * DJVUPURE_APIENTRY_EXPORT djvupureRawChunkRead(dj
 	chunk->callback_render = djvupureRawChunkCallbackRender;
 	chunk->hash = djvupureChunkGetStructHash();
 	chunk->ctx = 0;
+
+	if(io->callback_tell(fctx) % 2)
+		if(io->callback_seek(fctx, 1, DJVUPURE_IO_SEEK_CUR)) goto FAILURE;
 	
 	if(io->callback_read(fctx, chunk->sign, 4) != 4) goto FAILURE;
 	if(io->callback_read(fctx, chunk_len_be4, 4) != 4) goto FAILURE;
@@ -112,11 +115,6 @@ DJVUPURE_API djvupure_chunk_t * DJVUPURE_APIENTRY_EXPORT djvupureRawChunkRead(dj
 	*((size_t *)(chunk->ctx)) = (size_t)chunk_len;
 	
 	if(io->callback_read(fctx, (void *)(uctx+sizeof(size_t)), (size_t)chunk_len) != chunk_len) goto FAILURE;
-	if(chunk_len % 2) {
-		uint8_t dummy[1] = { 0 };
-
-		if(io->callback_read(fctx, dummy, 1) != 1) return false;
-	}
 
 	return chunk;
 	

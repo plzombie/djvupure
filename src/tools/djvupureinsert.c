@@ -35,7 +35,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 int wmain(int argc, wchar_t **argv)
 {
 	djvupure_io_callback_t io;
-	djvupure_chunk_t *page;
+	djvupure_chunk_t *document = 0, *page;
 	void *fctx = 0;
 	int result = EXIT_FAILURE;
 
@@ -48,7 +48,7 @@ int wmain(int argc, wchar_t **argv)
 		_command = wcsrchr(command, '/');
 		if(_command) command = _command+1;
 
-		wprintf(L"%ls page.djvu CHUNK1=param1 CHUNK2=param2 ...\n"
+		wprintf(L"%ls document.djvu CHUNK1=param1 CHUNK2=param2 ...\n"
 			L"\tfor INFO chunk there are special parameters \"INFO=width,height,dpi,rotation,gamma\", some parameters can be empty\n"
 			L"\t\trotation 1 is 0deg, 5 - 90deg, 2 - 180deg, 6 - 270deg\n"
 			L"\t\tgamma 22 stands for gamma value 2.2\n"
@@ -60,12 +60,20 @@ int wmain(int argc, wchar_t **argv)
 
 		return EXIT_SUCCESS;
 	}
-
-	page = djvupurePageCreate();
-	if(!page) goto FINAL;
-
+	
 	djvupureFileSetIoCallbacks(&io);
-
+	
+	fctx = djvupureFileOpenW(argv[1], false);
+	if(!fctx) goto FINAL;
+	
+	document = djvupureDocumentRead(&io, fctx);
+	djvupureFileClose(fctx);
+	fctx = 0;
+	if(!document) goto FINAL;
+	
+	if(!djvupurePageIs(document)) goto FINAL;
+	page = document;
+	
 	for(int i = 2; i < argc; i++) {
 		uint8_t sign[4];
 		wchar_t *chunk_filename;
@@ -94,12 +102,12 @@ int wmain(int argc, wchar_t **argv)
 	if(!fctx) goto FINAL;
 
 	if(!djvupureDocumentRender(page, &io, fctx)) goto FINAL;
-
+	
 	result = EXIT_SUCCESS;
-
+	
 FINAL:
 	if(fctx) djvupureFileClose(fctx);
-	if(page) djvupureChunkFree(page);
-
+	if(document) djvupureChunkFree(document);
+	
 	return result;
 }

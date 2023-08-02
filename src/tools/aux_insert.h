@@ -25,29 +25,11 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include "../include/djvupure.h"
+#ifndef AUX_INSERT_H
+#define AUX_INSERT_H
 
-#include <string.h>
+#include "../../include/djvupure.h"
 
-static const uint8_t djvupure_page_sign[4] = { 'D', 'J', 'V', 'U' };
+bool InsertChunkToPage(djvupure_chunk_t *page, uint8_t sign[4], wchar_t *param);
 
-DJVUPURE_API djvupure_chunk_t * DJVUPURE_APIENTRY_EXPORT djvupurePageCreate(void)
-{
-	return djvupureContainerCreate(djvupure_page_sign);
-}
-
-DJVUPURE_API bool DJVUPURE_APIENTRY_EXPORT djvupurePageCheckSign(const uint8_t sign[4])
-{
-	if(!memcmp(sign, djvupure_page_sign, 4))
-		return true;
-	else
-		return false;
-}
-
-DJVUPURE_API bool DJVUPURE_APIENTRY_EXPORT djvupurePageIs(djvupure_chunk_t *page)
-{
-	if(djvupureChunkGetStructHash() != page->hash) return false;
-	if(!djvupureContainerCheckSign(page->sign)) return false;
-
-	return true;
-}
+#endif

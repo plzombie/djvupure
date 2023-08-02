@@ -42,6 +42,7 @@ DJVUPURE_API bool DJVUPURE_APIENTRY_EXPORT djvupureContainerCheckSign(const uint
 
 DJVUPURE_API bool DJVUPURE_APIENTRY_EXPORT djvupureContainerIs(djvupure_chunk_t *container, const uint8_t subsign[4])
 {
+	if(djvupureChunkGetStructHash() != container->hash) return false;
 	if(!djvupureContainerCheckSign(container->sign)) return false;
 
 	if(subsign) {
@@ -143,6 +144,9 @@ DJVUPURE_API djvupure_chunk_t * DJVUPURE_APIENTRY_EXPORT djvupureContainerRead(d
 	
 	chunk_start = io->callback_tell(fctx);
 	ctx = container->ctx;
+
+	if(io->callback_tell(fctx) % 2)
+		if(io->callback_seek(fctx, 1, DJVUPURE_IO_SEEK_CUR)) goto FAILURE;
 	
 	if(io->callback_read(fctx, container->sign, 4) != 4) goto FAILURE;
 	if(!djvupureContainerCheckSign(container->sign)) goto FAILURE;
@@ -164,6 +168,9 @@ DJVUPURE_API djvupure_chunk_t * DJVUPURE_APIENTRY_EXPORT djvupureContainerRead(d
 		uint8_t sign[4];
 		djvupure_chunk_t *subchunk;
 		size_t index;
+
+		if(io->callback_tell(fctx) % 2)
+			if(io->callback_seek(fctx, 1, DJVUPURE_IO_SEEK_CUR)) goto FAILURE;
 
 		if(io->callback_read(fctx, sign, 4) != 4) goto FAILURE;
 		if(io->callback_seek(fctx, -4, DJVUPURE_IO_SEEK_CUR)) goto FAILURE;
@@ -196,8 +203,8 @@ DJVUPURE_API bool DJVUPURE_APIENTRY_EXPORT djvupureContainerInsertChunk(djvupure
 	size_t nof_allocsubchunks, nof_subchunks;
 	djvupure_chunk_t **subchunk;
 
-	if(!djvupureContainerCheckSign(container->sign)) return false;
 	if(djvupureChunkGetStructHash() != container->hash) return false;
+	if(!djvupureContainerCheckSign(container->sign)) return false;
 
 	uctx = (uintptr_t)(container->ctx);
 	nof_allocsubchunks = *((size_t *)(uctx+4+4));
@@ -237,8 +244,8 @@ DJVUPURE_API size_t DJVUPURE_APIENTRY_EXPORT djvupureContainerSize(djvupure_chun
 {
 	uintptr_t uctx;
 	
-	if(!djvupureContainerCheckSign(container->sign)) return 0;
 	if(djvupureChunkGetStructHash() != container->hash) return 0;
+	if(!djvupureContainerCheckSign(container->sign)) return 0;
 
 	uctx = (uintptr_t)(container->ctx);
 	return *((size_t *)(uctx+4+4+sizeof(size_t)));
@@ -250,8 +257,8 @@ DJVUPURE_API djvupure_chunk_t * DJVUPURE_APIENTRY_EXPORT djvupureContainerGetSub
 	size_t nof_subchunks;
 	djvupure_chunk_t **subchunk;
 	
-	if(!djvupureContainerCheckSign(container->sign)) return 0;
 	if(djvupureChunkGetStructHash() != container->hash) return 0;
+	if(!djvupureContainerCheckSign(container->sign)) return 0;
 
 	uctx = (uintptr_t)(container->ctx);
 	nof_subchunks = *((size_t *)(uctx+4+4+sizeof(size_t)));

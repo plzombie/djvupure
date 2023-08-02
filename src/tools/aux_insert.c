@@ -25,29 +25,52 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include "../include/djvupure.h"
+#include "aux_insert.h"
+#include "aux_create.h"
 
+#include <stdlib.h>
 #include <string.h>
+#include <wchar.h>
 
-static const uint8_t djvupure_page_sign[4] = { 'D', 'J', 'V', 'U' };
-
-DJVUPURE_API djvupure_chunk_t * DJVUPURE_APIENTRY_EXPORT djvupurePageCreate(void)
+bool InsertChunkToPage(djvupure_chunk_t *page, uint8_t sign[4], wchar_t *param)
 {
-	return djvupureContainerCreate(djvupure_page_sign);
-}
+	djvupure_chunk_t *chunk = 0;
+	
+	if(!memcmp(sign, "INFO", 4)) { // Process INFO chunk
+		chunk = CreateInfoChunkFromParams(param);
+	} else if(!memcmp(sign, "FG44", 4)) { // Process FG44 chunk
+		CreateIW44ChunkFromFile(page, "FG44", param, 1);
 
-DJVUPURE_API bool DJVUPURE_APIENTRY_EXPORT djvupurePageCheckSign(const uint8_t sign[4])
-{
-	if(!memcmp(sign, djvupure_page_sign, 4))
 		return true;
-	else
+	} else if(!memcmp(sign, "BG44", 4)) { // Process BG44 chunk
+		size_t n = 0;
+		wchar_t *p;
+			
+		p = wcsrchr(param, ',');
+		if(p) {
+			*p = 0;
+			p++;
+			n = _wtoi(p);
+		}
+
+		CreateIW44ChunkFromFile(page, "BG44", param, n);
+
+		return true;
+	} else { // Process others
+		chunk = CreateRawChunkFromFile(sign, param);
+	}
+	
+	if(chunk) {
+		size_t index;
+
+		index = djvupureContainerSize(page);
+
+		if(!djvupureContainerInsertChunk(page, chunk, index)) {
+			djvupureChunkFree(chunk);
+			
+			return false;
+		} else
+			return true;
+	} else
 		return false;
-}
-
-DJVUPURE_API bool DJVUPURE_APIENTRY_EXPORT djvupurePageIs(djvupure_chunk_t *page)
-{
-	if(djvupureChunkGetStructHash() != page->hash) return false;
-	if(!djvupureContainerCheckSign(page->sign)) return false;
-
-	return true;
 }
