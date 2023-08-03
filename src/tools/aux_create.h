@@ -28,7 +28,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef AUX_CREATE_H
 #define AUX_CREATE_H
 
-#include <wchar.h>
+#include "../../include/djvupure.h"
 
 djvupure_chunk_t * CreateInfoChunkFromParams(wchar_t *params);
 djvupure_chunk_t * CreateRawChunkFromFile(uint8_t sign[4], wchar_t *chunk_filename);

@@ -34,6 +34,8 @@ extern "C" {
 
 #include <stdbool.h>
 #include <stdint.h>
+#include <wchar.h>
+#include <stddef.h>
 
 #ifdef DJVUPURE_EXPORT_DLL
 #ifdef _WIN32
