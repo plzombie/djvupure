@@ -31,6 +31,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <stdio.h>
 #include <stdlib.h>
 #include <wchar.h>
+#include <locale.h>
 
 int wmain(int argc, wchar_t **argv)
 {
@@ -38,6 +39,8 @@ int wmain(int argc, wchar_t **argv)
 	djvupure_chunk_t *document = 0, *page;
 	void *fctx = 0;
 	int result = EXIT_FAILURE;
+
+	setlocale(LC_CTYPE, "");
 
 	if(argc <= 1) {
 		wchar_t *command, *_command;

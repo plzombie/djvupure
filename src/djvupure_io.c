@@ -25,6 +25,14 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+#ifndef _WIN32
+#define _LARGEFILE_SOURCE
+#define _LARGEFILE64_SOURCE
+#define _fseeki64 fseeko64
+#define _ftelli64 ftello64
+#include "../unixsupport/wfopen.h
+#endif
+
 #include "../include/djvupure.h"
 
 #include <stdio.h>

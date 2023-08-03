@@ -1,7 +1,8 @@
 /*
 BSD 2-Clause License
 
-Copyright (c) 2023, Mikhail Morozov
+Copyright (c) 2020, Mikhail Morozov
+All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are met:
@@ -25,56 +26,51 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include "aux_insert.h"
-#include "aux_create.h"
-
+#include <locale.h>
 #include <stdlib.h>
 #include <string.h>
 #include <wchar.h>
 
-#ifndef _WIN32
-#include "../unixsupport/wtoi.h
-#endif
+#include <stdio.h>
 
-bool InsertChunkToPage(djvupure_chunk_t *page, uint8_t sign[4], wchar_t *param)
+int wmain(int argc, wchar_t **argv);
+
+int main(int argc, char **argv)
 {
-	djvupure_chunk_t *chunk = 0;
-	
-	if(!memcmp(sign, "INFO", 4)) { // Process INFO chunk
-		chunk = CreateInfoChunkFromParams(param);
-	} else if(!memcmp(sign, "FG44", 4)) { // Process FG44 chunk
-		CreateIW44ChunkFromFile(page, "FG44", param, 1);
+	int i, retval;
+	size_t argv_len;
+	wchar_t **wstr_argv;
 
-		return true;
-	} else if(!memcmp(sign, "BG44", 4)) { // Process BG44 chunk
-		size_t n = 0;
-		wchar_t *p;
-			
-		p = wcsrchr(param, ',');
-		if(p) {
-			*p = 0;
-			p++;
-			n = _wtoi(p);
+	wstr_argv = malloc((argc+1)*sizeof(wchar_t *));
+	if(!wstr_argv)
+		exit(EXIT_FAILURE);
+
+	setlocale(LC_ALL, "");
+
+	for(i = 0; i < argc; i++) {
+		argv_len = strlen(argv[i]);
+		wstr_argv[i] = malloc((argv_len+1)*sizeof(wchar_t));
+		if(wstr_argv[i] == 0) {
+			int j;
+
+			for(j = 0; j < i; j++)
+				free(wstr_argv[j]);
+
+			return EXIT_FAILURE;
 		}
-
-		CreateIW44ChunkFromFile(page, "BG44", param, n);
-
-		return true;
-	} else { // Process others
-		chunk = CreateRawChunkFromFile(sign, param);
+		mbstowcs(wstr_argv[i], argv[i], argv_len);
+		wstr_argv[i][argv_len] = 0;
 	}
-	
-	if(chunk) {
-		size_t index;
 
-		index = djvupureContainerSize(page);
+	wstr_argv[argc] = 0;
 
-		if(!djvupureContainerInsertChunk(page, chunk, index)) {
-			djvupureChunkFree(chunk);
-			
-			return false;
-		} else
-			return true;
-	} else
-		return false;
+	setlocale(LC_ALL, "C");
+
+	retval = wmain(argc, wstr_argv);
+
+	for(i = 0; i < argc; i++)
+		free(wstr_argv[i]);
+	free(wstr_argv);
+
+	return retval;
 }

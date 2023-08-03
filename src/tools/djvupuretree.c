@@ -30,6 +30,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <stdio.h>
 #include <stdlib.h>
 #include <wchar.h>
+#include <locale.h>
 
 static void PrintChunks(djvupure_chunk_t *chunk, size_t level);
 
@@ -50,6 +51,8 @@ int wmain(int argc, wchar_t **argv)
 		DJVUPURE_VERSION_MAJOR, DJVUPURE_VERSION_MINOR, DJVUPURE_VERSION_REVISION,
 		major, minor, revision);
 #endif
+
+	setlocale(LC_CTYPE, "");
 
 	if(argc <= 1) {
 		wchar_t *command, *_command;
