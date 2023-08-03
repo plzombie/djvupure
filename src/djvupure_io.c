@@ -30,7 +30,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define _LARGEFILE64_SOURCE
 #define _fseeki64 fseeko64
 #define _ftelli64 ftello64
-#include "../unixsupport/wfopen.h
+#include "unixsupport/wfopen.h
 #endif
 
 #include "../include/djvupure.h"
