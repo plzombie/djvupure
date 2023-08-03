@@ -128,7 +128,7 @@ static void PrintChunks(djvupure_chunk_t *chunk, size_t level)
 		size_t container_size;
 		uint8_t *subsign;
 		
-		subsign = (char *)(chunk->ctx);
+		subsign = (uint8_t *)(chunk->ctx);
 		wprintf(L"Chunk %.4hs:%.4hs\n", chunk->sign, subsign);
 		level++;
 		
