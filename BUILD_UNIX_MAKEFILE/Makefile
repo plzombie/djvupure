@@ -17,7 +17,7 @@ djvupureinsert: libdjvupure.a djvupureinsert.o aux_create.o aux_insert.o wmain_s
 djvupuremake: libdjvupure.a djvupureinsert.o aux_create.o aux_insert.o wmain_stdc.o wtoi.o
 	$(CC) $(CFLAGS) djvupuremake.o aux_create.o aux_insert.o wmain_stdc.o wtoi.o $(LDFLAGS_TOOLS) -o djvupuremake
 
-libdjvupure.a: djvupure_container.o djvupure_core.o djvupure_document.o djvupure_info.o djvupure_io.o djvupure_page.o djvupure_raw.o
+libdjvupure.a: djvupure_container.o djvupure_core.o djvupure_document.o djvupure_info.o djvupure_io.o djvupure_page.o djvupure_raw.o wfopen.o
 	$(AR) rcs libdjvupure.a $^
 
 %.o: ../src/tools/%.c
