@@ -58,7 +58,7 @@ int wmain(int argc, wchar_t **argv)
 			L"\tfor other chunks parameter is a path to a file containing chunk data (i.e. \"Sjbz=page.sjbz\")\n"
 			L"\tChunks FG44 and BG44 should be a IFF85 file with a group of PM44 subchunks (can be created with extract utility)\n"
 			L"\t\tchunk FG44 extracts only one PM44 chunk from file\n"
-			L"\t\tchunk BG44 can be defined like \"BG44=file.bg44,n\" where n is a number of chunks to copy",
+			L"\t\tchunk BG44 can be defined like \"BG44=file.bg44,n\" where n is a number of chunks to copy\n",
 			command);
 
 		return EXIT_SUCCESS;
