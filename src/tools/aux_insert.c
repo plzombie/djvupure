@@ -33,17 +33,17 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <wchar.h>
 
 #ifndef _WIN32
-#include "../unixsupport/wtoi.h
+#include "../unixsupport/wtoi.h"
 #endif
 
-bool InsertChunkToPage(djvupure_chunk_t *page, uint8_t sign[4], wchar_t *param)
+bool InsertChunkToPage(djvupure_chunk_t *page, const uint8_t sign[4], wchar_t *param)
 {
 	djvupure_chunk_t *chunk = 0;
 	
 	if(!memcmp(sign, "INFO", 4)) { // Process INFO chunk
 		chunk = CreateInfoChunkFromParams(param);
 	} else if(!memcmp(sign, "FG44", 4)) { // Process FG44 chunk
-		CreateIW44ChunkFromFile(page, "FG44", param, 1);
+		CreateIW44ChunkFromFile(page, sign, param, 1);
 
 		return true;
 	} else if(!memcmp(sign, "BG44", 4)) { // Process BG44 chunk
@@ -57,7 +57,7 @@ bool InsertChunkToPage(djvupure_chunk_t *page, uint8_t sign[4], wchar_t *param)
 			n = _wtoi(p);
 		}
 
-		CreateIW44ChunkFromFile(page, "BG44", param, n);
+		CreateIW44ChunkFromFile(page, sign, param, n);
 
 		return true;
 	} else { // Process others

@@ -29,6 +29,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <wchar.h>
 
 #include "aux_create.h"
@@ -91,7 +92,7 @@ djvupure_chunk_t * CreateInfoChunkFromParams(wchar_t *params)
 	return djvupureInfoCreate(info);
 }
 
-djvupure_chunk_t * CreateRawChunkFromFile(uint8_t sign[4], wchar_t *chunk_filename)
+djvupure_chunk_t * CreateRawChunkFromFile(const uint8_t sign[4], wchar_t *chunk_filename)
 {
 	djvupure_io_callback_t io;
 	djvupure_chunk_t *chunk = 0;
@@ -144,7 +145,7 @@ FINAL:
 	return chunk;
 }
 
-void CreateIW44ChunkFromFile(djvupure_chunk_t *page, uint8_t sign[4], wchar_t *chunk_filename, size_t chunks_to_copy)
+void CreateIW44ChunkFromFile(djvupure_chunk_t *page, const uint8_t sign[4], wchar_t *chunk_filename, size_t chunks_to_copy)
 {
 	djvupure_io_callback_t io;
 	djvupure_chunk_t *chunk = 0, *pm44 = 0;

@@ -30,6 +30,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "../../include/djvupure.h"
 
-bool InsertChunkToPage(djvupure_chunk_t *page, uint8_t sign[4], wchar_t *param);
+bool InsertChunkToPage(djvupure_chunk_t *page, const uint8_t sign[4], wchar_t *param);
 
 #endif
