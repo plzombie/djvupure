@@ -27,6 +27,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "../include/djvupure.h"
 
+#include <string.h>
+
 static const uint8_t djvupure_info_sign[4] = { 'I', 'N', 'F', 'O' };
 static const size_t djvupure_info_len = 10;
 
