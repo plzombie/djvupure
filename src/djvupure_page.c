@@ -36,7 +36,7 @@ DJVUPURE_API djvupure_chunk_t * DJVUPURE_APIENTRY_EXPORT djvupurePageCreate(void
 	return djvupureContainerCreate(djvupure_page_sign);
 }
 
-DJVUPURE_API bool DJVUPURE_APIENTRY_EXPORT djvupurePageCheckSign(const uint8_t sign[4])
+DJVUPURE_API bool DJVUPURE_APIENTRY_EXPORT djvupurePageCheckSubsign(const uint8_t sign[4])
 {
 	if(!memcmp(sign, djvupure_page_sign, 4))
 		return true;
@@ -47,7 +47,7 @@ DJVUPURE_API bool DJVUPURE_APIENTRY_EXPORT djvupurePageCheckSign(const uint8_t s
 DJVUPURE_API bool DJVUPURE_APIENTRY_EXPORT djvupurePageIs(djvupure_chunk_t *page)
 {
 	if(djvupureChunkGetStructHash() != page->hash) return false;
-	if(!djvupureContainerCheckSign(page->sign)) return false;
+	if(!djvupureContainerIs(page, djvupure_page_sign)) return false;
 
 	return true;
 }

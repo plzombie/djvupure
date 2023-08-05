@@ -269,3 +269,61 @@ DJVUPURE_API djvupure_chunk_t * DJVUPURE_APIENTRY_EXPORT djvupureContainerGetSub
 	return *(subchunk+index);
 }
 
+DJVUPURE_API size_t DJVUPURE_APIENTRY_EXPORT djvupureContainerFindSubchunkBySign(djvupure_chunk_t *container, const uint8_t sign[4], const uint8_t subsign[4], size_t start)
+{
+	size_t nof_chunks, index;
+
+	nof_chunks = djvupureContainerSize(container);
+
+	for(index = start; index < nof_chunks; index++) {
+		djvupure_chunk_t *chunk;
+
+		chunk = djvupureContainerGetSubchunk(container, index);
+		if(!chunk) return nof_chunks;
+
+		if(!memcmp(chunk->sign, sign, 4)) {
+			if(subsign) {
+				if(djvupureContainerIs(chunk, subsign)) break;
+			} else break;
+		}
+	}
+
+	return index;
+}
+
+DJVUPURE_API djvupure_chunk_t * DJVUPURE_APIENTRY_EXPORT djvupureContainerGetSubchunkBySign(djvupure_chunk_t *container, const uint8_t sign[4], const uint8_t subsign[4], size_t index)
+{
+	size_t nof_chunks, i = 0, count = 0;
+		
+	nof_chunks = djvupureContainerSize(container);
+
+	while(count <= index) {
+		i = djvupureContainerFindSubchunkBySign(container, sign, subsign, i);
+		if(i >= nof_chunks) break;
+
+		if(count == index) return djvupureContainerGetSubchunk(container, i);
+
+		i++;
+		count++;
+	}
+
+	return 0;
+}
+
+DJVUPURE_API size_t DJVUPURE_APIENTRY_EXPORT djvupureContainerCountSubchunksBySign(djvupure_chunk_t *container, const uint8_t sign[4], const uint8_t subsign[4])
+{
+	size_t nof_chunks, i = 0, count = 0;
+		
+	nof_chunks = djvupureContainerSize(container);
+
+	while(true) {
+		i = djvupureContainerFindSubchunkBySign(container, sign, subsign, i);
+		if(i >= nof_chunks) break;
+
+		i++;
+		count++;
+	}
+
+	return count;
+}
+

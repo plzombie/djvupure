@@ -123,10 +123,17 @@ DJVUPURE_API djvupure_chunk_t * DJVUPURE_APIENTRY_EXPORT djvupureContainerRead(d
 DJVUPURE_API bool DJVUPURE_APIENTRY_EXPORT djvupureContainerInsertChunk(djvupure_chunk_t *container, djvupure_chunk_t *chunk, size_t index);
 DJVUPURE_API size_t DJVUPURE_APIENTRY_EXPORT djvupureContainerSize(djvupure_chunk_t *container);
 DJVUPURE_API djvupure_chunk_t * DJVUPURE_APIENTRY_EXPORT djvupureContainerGetSubchunk(djvupure_chunk_t *container, size_t index);
+DJVUPURE_API size_t DJVUPURE_APIENTRY_EXPORT djvupureContainerFindSubchunkBySign(djvupure_chunk_t *container, const uint8_t sign[4], const uint8_t subsign[4], size_t start);
+DJVUPURE_API djvupure_chunk_t * DJVUPURE_APIENTRY_EXPORT djvupureContainerGetSubchunkBySign(djvupure_chunk_t *container, const uint8_t sign[4], const uint8_t subsign[4], size_t index);
+DJVUPURE_API size_t DJVUPURE_APIENTRY_EXPORT djvupureContainerCountSubchunksBySign(djvupure_chunk_t *container, const uint8_t sign[4], const uint8_t subsign[4]);
 
 DJVUPURE_API djvupure_chunk_t * DJVUPURE_APIENTRY_EXPORT djvupureInfoCreate(djvupure_page_info_t info);
+DJVUPURE_API bool DJVUPURE_APIENTRY_EXPORT djvupureInfoCheckSign(const uint8_t sign[4]);
+DJVUPURE_API bool DJVUPURE_APIENTRY_EXPORT djvupureInfoIs(djvupure_chunk_t *info);
+DJVUPURE_API bool DJVUPURE_APIENTRY_EXPORT djvupureInfoGet(djvupure_chunk_t *info_chunk, djvupure_page_info_t *info_struct);
+DJVUPURE_API bool DJVUPURE_APIENTRY_EXPORT djvupureInfoPut(djvupure_chunk_t *info_chunk, djvupure_page_info_t *info_struct);
 
-DJVUPURE_API bool DJVUPURE_APIENTRY_EXPORT djvupurePageCheckSign(const uint8_t sign[4]);
+DJVUPURE_API bool DJVUPURE_APIENTRY_EXPORT djvupurePageCheckSubsign(const uint8_t sign[4]);
 DJVUPURE_API bool DJVUPURE_APIENTRY_EXPORT djvupurePageIs(djvupure_chunk_t *page);
 DJVUPURE_API djvupure_chunk_t * DJVUPURE_APIENTRY_EXPORT djvupurePageCreate(void);
 
