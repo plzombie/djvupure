@@ -45,6 +45,8 @@ DJVUPURE_API void DJVUPURE_APIENTRY_EXPORT djvupureChunkFree(djvupure_chunk_t *c
 {
 	if(chunk->hash != djvupureChunkGetStructHash()) return;
 	
+	if(chunk->callback_free_aux) chunk->callback_free_aux(chunk->aux);
+
 	chunk->callback_free(chunk->ctx);
 	free(chunk);
 }
@@ -90,4 +92,11 @@ DJVUPURE_API bool DJVUPURE_APIENTRY_EXPORT djvupureChunkRender(djvupure_chunk_t 
 	if(io->callback_seek(fctx, chunk_end, DJVUPURE_IO_SEEK_SET)) return false;
 	
 	return result;
+}
+
+DJVUPURE_API size_t DJVUPURE_APIENTRY_EXPORT djvupureChunkSize(djvupure_chunk_t *chunk)
+{
+	if(chunk->hash != djvupureChunkGetStructHash()) return 0;
+
+	return 8+chunk->callback_size(chunk->ctx);
 }

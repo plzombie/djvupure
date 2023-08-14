@@ -27,6 +27,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "../../include/djvupure.h"
 
+#ifndef _WIN32
+#include "../unixsupport/wtoi.h"
+#endif
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <wchar.h>
@@ -38,8 +42,9 @@ int wmain(int argc, wchar_t **argv)
 {
 	djvupure_io_callback_t io;
 	djvupure_chunk_t *document = 0, *page;
+	size_t index = 0;
 	void *fctx = 0;
-	int result = EXIT_FAILURE;
+	int result = EXIT_FAILURE, arg_start = 1;
 
 	setlocale(LC_CTYPE, "");
 
@@ -52,7 +57,7 @@ int wmain(int argc, wchar_t **argv)
 		_command = wcsrchr(command, '/');
 		if(_command) command = _command+1;
 
-		wprintf(L"%ls document.djvu CHUNK1=param1 CHUNK2=param2 ...\n"
+		wprintf(L"%ls [-page=pagenum] document.djvu CHUNK1=param1 CHUNK2=param2 ...\n"
 			L"\tParameter is a path to a file containing chunk data (i.e. \"Sjbz=page.sjbz\")\n"
 			L"\tFor chunks FG44 and BG44 an IFF85 file with a group of PM44 subchunks will be produced\n",
 			command);
@@ -60,9 +65,20 @@ int wmain(int argc, wchar_t **argv)
 		return EXIT_SUCCESS;
 	}
 	
+	if(!wcsncmp(argv[1], L"-page=", 6)) {
+		if(argc < 3) {
+			wprintf(L"Please specify document name and chunks\n");
+
+			return EXIT_FAILURE;
+		}
+
+		index = _wtoi(argv[1]+6)-1;
+		arg_start++;
+	}
+
 	djvupureFileSetIoCallbacks(&io);
 	
-	fctx = djvupureFileOpenW(argv[1], false);
+	fctx = djvupureFileOpenW(argv[arg_start], false);
 	if(!fctx) goto FINAL;
 	
 	document = djvupureDocumentRead(&io, fctx);
@@ -70,10 +86,10 @@ int wmain(int argc, wchar_t **argv)
 	fctx = 0;
 	if(!document) goto FINAL;
 	
-	if(!djvupurePageIs(document)) goto FINAL;
-	page = document;
+	page = djvupureDocumentGetPage(document, index, djvupureFileOpenU8);
+	if(!page) goto FINAL;
 	
-	for(int i = 2; i < argc; i++) {
+	for(int i = arg_start+1; i < argc; i++) {
 		uint8_t sign[4];
 		wchar_t *chunk_filename;
 		size_t j;
@@ -95,6 +111,10 @@ int wmain(int argc, wchar_t **argv)
 		
 		if(!ExtractChunkFromPage(page, sign, chunk_filename))
 			wprintf(L"Can't extract chunk %.4hs\n", sign);
+	}
+
+	if(!djvupureDocumentPutPage(document, page, false, djvupureFileOpenU8)) {
+		wprintf(L"Can't put page back\n");
 	}
 	
 	result = EXIT_SUCCESS;

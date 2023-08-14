@@ -69,7 +69,6 @@ DJVUPURE_API bool DJVUPURE_APIENTRY_EXPORT djvupureInfoCheckSign(const uint8_t s
 
 DJVUPURE_API bool DJVUPURE_APIENTRY_EXPORT djvupureInfoIs(djvupure_chunk_t *info)
 {
-
 	if(djvupureChunkGetStructHash() != info->hash) return false;
 	if(!djvupureInfoCheckSign(info->sign)) return false;
 

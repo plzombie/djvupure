@@ -70,6 +70,21 @@ DJVUPURE_API void * DJVUPURE_APIENTRY_EXPORT djvupureFileOpenW(wchar_t *filename
 #endif
 }
 
+DJVUPURE_API bool DJVUPURE_APIENTRY_EXPORT djvupureFileOpenU8(uint8_t *fname, bool write, djvupure_io_callback_t *io, void **fctx)
+{
+#ifdef _WIN32
+	// Here should be conversion to utf8. Maybe we should convert utf8 to widechar to multibyte for unices too (because multibyte need not be utf8)
+	*fctx = djvupureFileOpenA(fname, write);
+#else
+	*fctx = djvupureFileOpenA(fname, write);
+#endif
+	if(*fctx == 0) return false;
+
+	djvupureFileSetIoCallbacks(io);
+
+	return true;
+}
+
 DJVUPURE_API void DJVUPURE_APIENTRY_EXPORT djvupureFileClose(void *fctx)
 {
 	fclose((FILE *)fctx);

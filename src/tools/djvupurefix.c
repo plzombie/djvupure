@@ -43,8 +43,10 @@ int wmain(int argc, wchar_t **argv)
 	djvupure_io_callback_t io;
 	djvupure_chunk_t *document = 0;
 	uint16_t new_dpi = 0;
+	size_t index = 0;
+	bool index_supplied = false;
 	void *fctx = 0;
-	int result = EXIT_FAILURE;
+	int result = EXIT_FAILURE, arg_start = 1;
 
 	setlocale(LC_CTYPE, "");
 
@@ -57,17 +59,29 @@ int wmain(int argc, wchar_t **argv)
 		_command = wcsrchr(command, '/');
 		if(_command) command = _command+1;
 
-		wprintf(L"%ls document.djvu [new_dpi]\n",
+		wprintf(L"%ls [-page=pagenum] document.djvu [new_dpi]\n",
 			command);
 
 		return EXIT_SUCCESS;
 	}
+
+	if(!wcsncmp(argv[1], L"-page=", 6)) {
+		if(argc < 3) {
+			wprintf(L"Please specify document name\n");
+
+			return EXIT_FAILURE;
+		}
+
+		index = _wtoi(argv[1]+6)-1;
+		index_supplied = true;
+		arg_start++;
+	}
 	
-	if(argc > 2) new_dpi = (uint16_t)(_wtoi(argv[2]));
+	if(argc > arg_start+1) new_dpi = (uint16_t)(_wtoi(argv[arg_start+1]));
 	
 	djvupureFileSetIoCallbacks(&io);
 	
-	fctx = djvupureFileOpenW(argv[1], false);
+	fctx = djvupureFileOpenW(argv[arg_start], false);
 	if(!fctx) goto FINAL;
 	
 	document = djvupureDocumentRead(&io, fctx);
@@ -78,26 +92,38 @@ int wmain(int argc, wchar_t **argv)
 	if(djvupurePageIs(document))
 		FixPage(document, new_dpi);
 	else {
-		size_t nof_chunks, index = 0;
-		
-		nof_chunks = djvupureContainerSize(document);
-
-		while(true) {
+		if(index_supplied) {
 			djvupure_chunk_t *page;
-			const uint8_t form_sign[4] = { 'F', 'O', 'R', 'M' };
-			const uint8_t page_sign[4] = { 'D', 'J', 'V', 'U' };
 
-			index = djvupureContainerFindSubchunkBySign(document, form_sign, page_sign, index);
-			if(index >= nof_chunks) break;
+			page = djvupureDocumentGetPage(document, index, djvupureFileOpenU8);
+			if(!page) {
+				wprintf(L"Can't get specified page\n");
+			} else {
+				FixPage(page, new_dpi);
 
-			page = djvupureContainerGetSubchunk(document, index);
-			if(page) FixPage(page, new_dpi);
+				djvupureDocumentPutPage(document, page, true, djvupureFileOpenU8);
+			}
+		} else {
+			size_t nof_pages;
 
-			index++;
+			nof_pages = djvupureDocumentCountPages(document);
+
+			for(size_t i = 0; i < nof_pages; i++) {
+				djvupure_chunk_t *page;
+
+				page = djvupureDocumentGetPage(document, i, djvupureFileOpenU8);
+
+				if(page) {
+					FixPage(page, new_dpi);
+
+					djvupureDocumentPutPage(document, page, true, djvupureFileOpenU8);
+				}
+			}
 		}
+		
 	}
 	
-	fctx = djvupureFileOpenW(argv[1], true);
+	fctx = djvupureFileOpenW(argv[arg_start], true);
 	if(!fctx) goto FINAL;
 
 	if(!djvupureDocumentRender(document, &io, fctx)) goto FINAL;

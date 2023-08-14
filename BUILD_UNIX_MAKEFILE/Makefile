@@ -20,10 +20,10 @@ djvupuremake: libdjvupure.a djvupuremake.o aux_create.o aux_insert.o wmain_stdc.
 djvupurefix: libdjvupure.a djvupurefix.o wmain_stdc.o wtoi.o
 	$(CC) $(CFLAGS) djvupurefix.o wmain_stdc.o wtoi.o $(LDFLAGS_TOOLS) -o djvupurefix
 
-djvupureextract: libdjvupure.a djvupureextract.o wmain_stdc.o
-	$(CC) $(CFLAGS) djvupureextract.o wmain_stdc.o $(LDFLAGS_TOOLS) -o djvupureextract
+djvupureextract: libdjvupure.a djvupureextract.o wmain_stdc.o wtoi.o
+	$(CC) $(CFLAGS) djvupureextract.o wmain_stdc.o wtoi.o $(LDFLAGS_TOOLS) -o djvupureextract
 
-libdjvupure.a: djvupure_container.o djvupure_core.o djvupure_document.o djvupure_info.o djvupure_io.o djvupure_page.o djvupure_raw.o wfopen.o wcstombsl.o
+libdjvupure.a: djvupure_container.o djvupure_core.o djvupure_document.o djvupure_dir.o djvupure_info.o djvupure_io.o djvupure_page.o djvupure_raw.o wfopen.o wcstombsl.o
 	$(AR) rcs libdjvupure.a $^
 
 %.o: ../src/tools/%.c

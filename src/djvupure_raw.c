@@ -52,6 +52,13 @@ static bool DJVUPURE_APIENTRY djvupureRawChunkCallbackRender(void *ctx, djvupure
 	return true;
 }
 
+static size_t DJVUPURE_APIENTRY djvupureRawChunkCallbackSize(void *ctx)
+{
+	if(!ctx) return 0;
+
+	return *((size_t*)ctx);
+}
+
 DJVUPURE_API djvupure_chunk_t * DJVUPURE_APIENTRY_EXPORT djvupureRawChunkCreate(const uint8_t sign[4], void *data, size_t data_len)
 {
 	djvupure_chunk_t *chunk = 0;
@@ -61,8 +68,10 @@ DJVUPURE_API djvupure_chunk_t * DJVUPURE_APIENTRY_EXPORT djvupureRawChunkCreate(
 	
 	chunk = malloc(sizeof(djvupure_chunk_t));
 	if(!chunk) return 0;
+	memset(chunk, 0, sizeof(djvupure_chunk_t));
 	chunk->callback_free = djvupureRawChunkCallbackFree;
 	chunk->callback_render = djvupureRawChunkCallbackRender;
+	chunk->callback_size = djvupureRawChunkCallbackSize;
 	chunk->hash = djvupureChunkGetStructHash();
 	chunk->ctx = 0;
 	memcpy(chunk->sign, sign, 4);
@@ -90,8 +99,10 @@ DJVUPURE_API djvupure_chunk_t * DJVUPURE_APIENTRY_EXPORT djvupureRawChunkRead(dj
 	
 	chunk = malloc(sizeof(djvupure_chunk_t));
 	if(!chunk) return 0;
+	memset(chunk, 0, sizeof(djvupure_chunk_t));
 	chunk->callback_free = djvupureRawChunkCallbackFree;
 	chunk->callback_render = djvupureRawChunkCallbackRender;
+	chunk->callback_size = djvupureRawChunkCallbackSize;
 	chunk->hash = djvupureChunkGetStructHash();
 	chunk->ctx = 0;
 

@@ -295,6 +295,7 @@
   <ItemGroup>
     <ClCompile Include="..\..\src\djvupure_container.c" />
     <ClCompile Include="..\..\src\djvupure_core.c" />
+    <ClCompile Include="..\..\src\djvupure_dir.c" />
     <ClCompile Include="..\..\src\djvupure_document.c" />
     <ClCompile Include="..\..\src\djvupure_info.c" />
     <ClCompile Include="..\..\src\djvupure_io.c" />

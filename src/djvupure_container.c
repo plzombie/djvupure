@@ -97,6 +97,29 @@ static bool DJVUPURE_APIENTRY djvupureContainerCallbackRender(void *ctx, djvupur
 	return true;
 }
 
+static size_t DJVUPURE_APIENTRY djvupureContainerCallbackSize(void *ctx)
+{
+	uintptr_t uctx;
+	size_t sz = 4, nof_subchunks;
+	djvupure_chunk_t **subchunk;
+
+	if(!ctx) return 0;
+
+	uctx = (uintptr_t)ctx;
+	nof_subchunks = *((size_t *)(uctx+4+4+sizeof(size_t)));
+	subchunk = (djvupure_chunk_t **)(uctx+4+4+sizeof(size_t)*2);
+
+	for(size_t i = 0; i < nof_subchunks; i++) {
+		if(sz%2) sz++;
+
+		sz += djvupureChunkSize(*subchunk);
+
+		subchunk++;
+	}
+
+	return sz;
+}
+
 DJVUPURE_API djvupure_chunk_t * DJVUPURE_APIENTRY_EXPORT djvupureContainerCreate(const uint8_t subsign[4])
 {
 	djvupure_chunk_t *container = 0;
@@ -105,8 +128,10 @@ DJVUPURE_API djvupure_chunk_t * DJVUPURE_APIENTRY_EXPORT djvupureContainerCreate
 	container = malloc(sizeof(djvupure_chunk_t));
 	if(!container) return 0;
 	
+	memset(container, 0, sizeof(djvupure_chunk_t));
 	container->callback_free = djvupureContainerCallbackFree;
 	container->callback_render = djvupureContainerCallbackRender;
+	container->callback_size = djvupureContainerCallbackSize;
 	container->hash = djvupureChunkGetStructHash();
 	ctx_size = 4+4+sizeof(size_t)*2;
 	container->ctx = malloc(ctx_size);
@@ -134,8 +159,10 @@ DJVUPURE_API djvupure_chunk_t * DJVUPURE_APIENTRY_EXPORT djvupureContainerRead(d
 	container = malloc(sizeof(djvupure_chunk_t));
 	if(!container) return 0;
 	
+	memset(container, 0, sizeof(djvupure_chunk_t));
 	container->callback_free = djvupureContainerCallbackFree;
 	container->callback_render = djvupureContainerCallbackRender;
+	container->callback_size = djvupureContainerCallbackSize;
 	container->hash = djvupureChunkGetStructHash();
 	ctx_size = 4+4+sizeof(size_t)*2;
 	container->ctx = malloc(ctx_size);

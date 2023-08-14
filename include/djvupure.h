@@ -57,7 +57,7 @@ extern "C" {
 
 #define DJVUPURE_VERSION_MAJOR ((uint32_t)0)
 #define DJVUPURE_VERSION_MINOR ((uint32_t)0)
-#define DJVUPURE_VERSION_REVISION ((uint32_t)0)
+#define DJVUPURE_VERSION_REVISION ((uint32_t)1)
 
 #define DJVUPURE_IO_SEEK_CUR 0
 #define DJVUPURE_IO_SEEK_END 1
@@ -68,6 +68,7 @@ typedef size_t (DJVUPURE_APIENTRY * djvupure_io_callback_write_t)(void *fctx, co
 typedef int (DJVUPURE_APIENTRY * djvupure_io_callback_seek_t)(void *fctx, int64_t offset, int origin);
 typedef int64_t (DJVUPURE_APIENTRY * djvupure_io_callback_tell_t)(void *fctx);
 
+
 typedef struct {
 	uint32_t hash;
 	djvupure_io_callback_read_t callback_read;
@@ -76,15 +77,22 @@ typedef struct {
 	djvupure_io_callback_tell_t callback_tell;
 } djvupure_io_callback_t;
 
+typedef bool (DJVUPURE_APIENTRY * djvupure_io_callback_openu8_t)(uint8_t *fname, bool write, djvupure_io_callback_t *io, void **fctx);
+
 typedef void (DJVUPURE_APIENTRY * djvupure_chunk_callback_free_t)(void *ctx);
 typedef bool (DJVUPURE_APIENTRY * djvupure_chunk_callback_render_t)(void *ctx, djvupure_io_callback_t *io, void *fctx);
+typedef size_t (DJVUPURE_APIENTRY * djvupure_chunk_callback_size_t)(void *ctx);
+typedef void (DJVUPURE_APIENTRY * djvupure_chunk_callback_free_aux_t)(void *aux);
 
 typedef struct {
 	uint32_t hash;
 	uint8_t sign[4];
 	void *ctx;
+	void *aux;
 	djvupure_chunk_callback_free_t callback_free;
 	djvupure_chunk_callback_render_t callback_render;
+	djvupure_chunk_callback_size_t callback_size;
+	djvupure_chunk_callback_free_aux_t callback_free_aux;
 } djvupure_chunk_t;
 
 typedef struct {
@@ -104,11 +112,13 @@ DJVUPURE_API void DJVUPURE_APIENTRY_EXPORT djvupureGetVersion(uint32_t *major, u
 DJVUPURE_API uint32_t DJVUPURE_APIENTRY_EXPORT djvupureChunkGetStructHash(void);
 DJVUPURE_API void DJVUPURE_APIENTRY_EXPORT djvupureChunkFree(djvupure_chunk_t *chunk);
 DJVUPURE_API bool DJVUPURE_APIENTRY_EXPORT djvupureChunkRender(djvupure_chunk_t *chunk, djvupure_io_callback_t *io, void *fctx);
+DJVUPURE_API size_t DJVUPURE_APIENTRY_EXPORT djvupureChunkSize(djvupure_chunk_t *chunk);
 
 DJVUPURE_API uint32_t DJVUPURE_APIENTRY_EXPORT djvupureIOGetStructHash(void);
 
 DJVUPURE_API void * DJVUPURE_APIENTRY_EXPORT djvupureFileOpenA(char *filename, bool write);
 DJVUPURE_API void * DJVUPURE_APIENTRY_EXPORT djvupureFileOpenW(wchar_t *filename, bool write);
+DJVUPURE_API bool DJVUPURE_APIENTRY_EXPORT djvupureFileOpenU8(uint8_t *fname, bool write, djvupure_io_callback_t *io, void **fctx);
 DJVUPURE_API void DJVUPURE_APIENTRY_EXPORT djvupureFileClose(void *fctx);
 DJVUPURE_API void DJVUPURE_APIENTRY_EXPORT djvupureFileSetIoCallbacks(djvupure_io_callback_t *io);
 
@@ -137,7 +147,18 @@ DJVUPURE_API bool DJVUPURE_APIENTRY_EXPORT djvupurePageCheckSubsign(const uint8_
 DJVUPURE_API bool DJVUPURE_APIENTRY_EXPORT djvupurePageIs(djvupure_chunk_t *page);
 DJVUPURE_API djvupure_chunk_t * DJVUPURE_APIENTRY_EXPORT djvupurePageCreate(void);
 
+DJVUPURE_API bool DJVUPURE_APIENTRY_EXPORT djvupureDirCheckSign(const uint8_t sign[4]);
+DJVUPURE_API bool DJVUPURE_APIENTRY_EXPORT djvupureDirIs(djvupure_chunk_t *dir);
+DJVUPURE_API bool DJVUPURE_APIENTRY_EXPORT djvupureDirInit(djvupure_chunk_t *dir, djvupure_chunk_t *document);
+DJVUPURE_API size_t DJVUPURE_APIENTRY_EXPORT djvupureDirCountPages(djvupure_chunk_t *dir);
+DJVUPURE_API djvupure_chunk_t * DJVUPURE_APIENTRY_EXPORT djvupureDirGetPage(djvupure_chunk_t *dir, size_t index, djvupure_io_callback_openu8_t openu8);
+DJVUPURE_API bool DJVUPURE_APIENTRY_EXPORT djvupureDirPutPage(djvupure_chunk_t *dir, djvupure_chunk_t *page, bool changed, djvupure_io_callback_openu8_t openu8);
+
+DJVUPURE_API bool DJVUPURE_APIENTRY_EXPORT djvupureDocumentIs(djvupure_chunk_t *document);
 DJVUPURE_API djvupure_chunk_t * DJVUPURE_APIENTRY_EXPORT djvupureDocumentRead(djvupure_io_callback_t *io, void *fctx);
 DJVUPURE_API bool DJVUPURE_APIENTRY_EXPORT djvupureDocumentRender(djvupure_chunk_t *chunk, djvupure_io_callback_t *io, void *fctx);
+DJVUPURE_API size_t DJVUPURE_APIENTRY_EXPORT djvupureDocumentCountPages(djvupure_chunk_t *document);
+DJVUPURE_API djvupure_chunk_t * DJVUPURE_APIENTRY_EXPORT djvupureDocumentGetPage(djvupure_chunk_t *document, size_t index, djvupure_io_callback_openu8_t openu8);
+DJVUPURE_API bool DJVUPURE_APIENTRY_EXPORT djvupureDocumentPutPage(djvupure_chunk_t *document, djvupure_chunk_t *page, bool changed, djvupure_io_callback_openu8_t openu8);
 
 #endif

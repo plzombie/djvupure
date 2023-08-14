@@ -32,7 +32,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <wchar.h>
 #include <locale.h>
 
-static void PrintChunks(djvupure_chunk_t *chunk, size_t level);
+static void PrintChunks(djvupure_chunk_t *chunk, size_t level, size_t offset);
 
 int wmain(int argc, wchar_t **argv)
 {
@@ -91,7 +91,7 @@ int wmain(int argc, wchar_t **argv)
 		return EXIT_FAILURE;
 	}
 	
-	PrintChunks(document, 0);
+	PrintChunks(document, 0, 4);
 	
 	
 	
@@ -120,7 +120,7 @@ int wmain(int argc, wchar_t **argv)
 	return EXIT_SUCCESS;
 }
 
-static void PrintChunks(djvupure_chunk_t *chunk, size_t level)
+static void PrintChunks(djvupure_chunk_t *chunk, size_t level, size_t offset)
 {
 	for(size_t i = 0; i < level; i++) wprintf(L"-");
 	
@@ -129,17 +129,38 @@ static void PrintChunks(djvupure_chunk_t *chunk, size_t level)
 		uint8_t *subsign;
 		
 		subsign = (uint8_t *)(chunk->ctx);
-		wprintf(L"Chunk %.4hs:%.4hs\n", chunk->sign, subsign);
+		wprintf(L"Chunk %.4hs:%.4hs (size %u offset %u)\n", chunk->sign, subsign, (unsigned int)djvupureChunkSize(chunk), (unsigned int)offset);
 		level++;
 		
 		container_size = djvupureContainerSize(chunk);
+
+		offset += 12;
 		
 		for(size_t index = 0; index < container_size; index++) {
 			djvupure_chunk_t *subchunk;
+
+			if(offset%2) offset++;
 			
 			subchunk = djvupureContainerGetSubchunk(chunk, index);
-			if(subchunk) PrintChunks(subchunk, level);
+			if(subchunk) PrintChunks(subchunk, level, offset);
+
+			offset += djvupureChunkSize(subchunk);
 		}
-	} else
-		wprintf(L"Chunk %.4hs\n", chunk->sign);
+	} else {
+		wprintf(L"Chunk %.4hs (size %u offset %u)\n", chunk->sign, (unsigned int)djvupureChunkSize(chunk), (unsigned int)offset);
+
+		if(djvupureDirCheckSign(chunk->sign)) {
+			wprintf(L"\t# of pages = %u\n", (unsigned int)(djvupureDirCountPages(chunk)));
+		} else if(djvupureInfoCheckSign(chunk->sign)) {
+			djvupure_page_info_t info_struct;
+
+			if(djvupureInfoGet(chunk, &info_struct)) {
+				wprintf(L"\twidth = %hu\n", info_struct.width);
+				wprintf(L"\theignt = %hu\n", info_struct.height);
+				wprintf(L"\tdpi = %hu\n", info_struct.dpi);
+				wprintf(L"\tgamma = %u.%u\n", (unsigned int)(info_struct.gamma/10), (unsigned int)(info_struct.gamma%10));
+				wprintf(L"\trotation %hhu\n", info_struct.rotation);
+			}
+		}
+	}
 }

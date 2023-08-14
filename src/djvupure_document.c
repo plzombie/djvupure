@@ -29,14 +29,52 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <string.h>
 
+static const uint8_t djvupure_document_sign[4] = { 'D', 'J', 'V', 'M' };
+static const uint8_t djvupure_page_sign[4] = { 'D', 'J', 'V', 'U' };
+
+DJVUPURE_API bool DJVUPURE_APIENTRY_EXPORT djvupureDocumentIs(djvupure_chunk_t *document)
+{
+	if(djvupureChunkGetStructHash() != document->hash) return false;
+	if(djvupureContainerIs(document, djvupure_document_sign)) return true;
+	if(djvupureContainerIs(document, djvupure_page_sign)) return true;
+	return false;
+}
+
 DJVUPURE_API djvupure_chunk_t * DJVUPURE_APIENTRY_EXPORT djvupureDocumentRead(djvupure_io_callback_t *io, void *fctx)
 {
 	uint8_t atnt_sign[4] = { 'A', 'T', '&', 'T' }, sign[4];
+	djvupure_chunk_t *document;
 	
 	if(io->callback_read(fctx, sign, 4) != 4) return 0;
 	if(memcmp(sign, atnt_sign, 4)) return 0;
 	
-	return djvupureContainerRead(io, fctx);
+	document = djvupureContainerRead(io, fctx);
+	if(!document) return 0;
+
+	if(djvupureContainerIs(document, djvupure_document_sign)) {
+		djvupure_chunk_t *dir;
+
+		dir = djvupureContainerGetSubchunk(document, 0);
+		if(!dir) {
+			djvupureChunkFree(document);
+
+			return 0;
+		}
+
+		if(!djvupureDirIs(dir)) {
+			djvupureChunkFree(document);
+
+			return 0;
+		}
+
+		if(!djvupureDirInit(dir, document)) {
+			djvupureChunkFree(document);
+
+			return 0;
+		}
+	}
+
+	return document;
 }
 
 DJVUPURE_API bool DJVUPURE_APIENTRY_EXPORT djvupureDocumentRender(djvupure_chunk_t *chunk, djvupure_io_callback_t *io, void *fctx)
@@ -44,6 +82,60 @@ DJVUPURE_API bool DJVUPURE_APIENTRY_EXPORT djvupureDocumentRender(djvupure_chunk
 	uint8_t atnt_sign[4] = { 'A', 'T', '&', 'T' };
 	
 	if(io->callback_write(fctx, atnt_sign, 4) != 4) return false;
-	
+
 	return djvupureChunkRender(chunk, io, fctx);
+}
+
+DJVUPURE_API size_t DJVUPURE_APIENTRY_EXPORT djvupureDocumentCountPages(djvupure_chunk_t *document)
+{
+	djvupure_chunk_t *dir;
+
+	if(!djvupureDocumentIs(document)) return 0;
+	if(djvupureContainerIs(document, djvupure_page_sign)) return 1;
+
+	dir = djvupureContainerGetSubchunk(document, 0);
+	if(!dir) return 0;
+
+	if(!djvupureDirIs(dir)) return 0;
+
+	return djvupureDirCountPages(dir);
+}
+
+DJVUPURE_API djvupure_chunk_t * DJVUPURE_APIENTRY_EXPORT djvupureDocumentGetPage(djvupure_chunk_t *document, size_t index, djvupure_io_callback_openu8_t openu8)
+{
+	djvupure_chunk_t *dir;
+
+	(void)openu8;
+
+	if(!djvupureDocumentIs(document)) return 0;
+	if(djvupureContainerIs(document, djvupure_page_sign)) return document;
+
+	dir = djvupureContainerGetSubchunk(document, 0);
+	if(!dir) return 0;
+
+	if(!djvupureDirIs(dir)) return 0;
+
+	return djvupureDirGetPage(dir, index, openu8);
+}
+
+DJVUPURE_API bool DJVUPURE_APIENTRY_EXPORT djvupureDocumentPutPage(djvupure_chunk_t *document, djvupure_chunk_t *page, bool changed, djvupure_io_callback_openu8_t openu8)
+{
+	djvupure_chunk_t *dir;
+
+	(void)openu8;
+
+	if(!djvupureDocumentIs(document)) return false;
+
+	if(djvupureContainerIs(document, djvupure_page_sign)) {
+		if(document == page) return true;
+
+		return false;
+	}
+
+	dir = djvupureContainerGetSubchunk(document, 0);
+	if(!dir) return false;
+
+	if(!djvupureDirIs(dir)) return false;
+
+	return djvupureDirPutPage(dir, page, changed, openu8);
 }
