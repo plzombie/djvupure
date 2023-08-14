@@ -199,13 +199,14 @@ DJVUPURE_API size_t DJVUPURE_APIENTRY_EXPORT djvupureDirCountPages(djvupure_chun
 	return dir_aux->nof_pages;
 }
 
-DJVUPURE_API djvupure_chunk_t * DJVUPURE_APIENTRY_EXPORT djvupureDirGetPage(djvupure_chunk_t *dir, size_t index, djvupure_io_callback_openu8_t openu8)
+DJVUPURE_API djvupure_chunk_t * DJVUPURE_APIENTRY_EXPORT djvupureDirGetPage(djvupure_chunk_t *dir, size_t index, djvupure_io_callback_openu8_t openu8, djvupure_io_callback_close_t close)
 {
 	djvupure_dir_aux_t *dir_aux;
 	djvupure_dir_aux_file_t *files;
 	size_t nof_files, count = 0;
 
 	(void)openu8;
+	(void)close;
 
 	if(!djvupureDirIs(dir)) return 0;
 	if(dir->aux == 0) return 0;
@@ -234,11 +235,12 @@ DJVUPURE_API djvupure_chunk_t * DJVUPURE_APIENTRY_EXPORT djvupureDirGetPage(djvu
 	return 0;
 }
 
-DJVUPURE_API bool DJVUPURE_APIENTRY_EXPORT djvupureDirPutPage(djvupure_chunk_t *dir, djvupure_chunk_t *page, bool changed, djvupure_io_callback_openu8_t openu8)
+DJVUPURE_API bool DJVUPURE_APIENTRY_EXPORT djvupureDirPutPage(djvupure_chunk_t *dir, djvupure_chunk_t *page, bool changed, djvupure_io_callback_openu8_t openu8, djvupure_io_callback_close_t close)
 {
 	djvupure_dir_aux_t *dir_aux;
 
 	(void)openu8;
+	(void)close;
 
 	if(!djvupureDirIs(dir)) return false;
 

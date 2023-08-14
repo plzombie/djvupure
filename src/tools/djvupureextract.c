@@ -86,7 +86,7 @@ int wmain(int argc, wchar_t **argv)
 	fctx = 0;
 	if(!document) goto FINAL;
 	
-	page = djvupureDocumentGetPage(document, index, djvupureFileOpenU8);
+	page = djvupureDocumentGetPage(document, index, djvupureFileOpenU8, djvupureFileClose);
 	if(!page) goto FINAL;
 	
 	for(int i = arg_start+1; i < argc; i++) {
@@ -113,7 +113,7 @@ int wmain(int argc, wchar_t **argv)
 			wprintf(L"Can't extract chunk %.4hs\n", sign);
 	}
 
-	if(!djvupureDocumentPutPage(document, page, false, djvupureFileOpenU8)) {
+	if(!djvupureDocumentPutPage(document, page, false, djvupureFileOpenU8, djvupureFileClose)) {
 		wprintf(L"Can't put page back\n");
 	}
 	

@@ -95,13 +95,13 @@ int wmain(int argc, wchar_t **argv)
 		if(index_supplied) {
 			djvupure_chunk_t *page;
 
-			page = djvupureDocumentGetPage(document, index, djvupureFileOpenU8);
+			page = djvupureDocumentGetPage(document, index, djvupureFileOpenU8, djvupureFileClose);
 			if(!page) {
 				wprintf(L"Can't get specified page\n");
 			} else {
 				FixPage(page, new_dpi);
 
-				djvupureDocumentPutPage(document, page, true, djvupureFileOpenU8);
+				djvupureDocumentPutPage(document, page, true, djvupureFileOpenU8, djvupureFileClose);
 			}
 		} else {
 			size_t nof_pages;
@@ -111,12 +111,12 @@ int wmain(int argc, wchar_t **argv)
 			for(size_t i = 0; i < nof_pages; i++) {
 				djvupure_chunk_t *page;
 
-				page = djvupureDocumentGetPage(document, i, djvupureFileOpenU8);
+				page = djvupureDocumentGetPage(document, i, djvupureFileOpenU8, djvupureFileClose);
 
 				if(page) {
 					FixPage(page, new_dpi);
 
-					djvupureDocumentPutPage(document, page, true, djvupureFileOpenU8);
+					djvupureDocumentPutPage(document, page, true, djvupureFileOpenU8, djvupureFileClose);
 				}
 			}
 		}
