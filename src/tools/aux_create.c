@@ -32,7 +32,54 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <string.h>
 #include <wchar.h>
 
+#ifdef _WIN32
+#include <Windows.h>
+#endif
+
 #include "aux_create.h"
+
+djvupure_chunk_t * CreateInclChunkFromParams(wchar_t *params)
+{
+	char *cparams;
+	size_t cparams_len;
+	djvupure_chunk_t *chunk;
+	const uint8_t incl_sign[4] = { 'I', 'N', 'C', 'L' };
+
+#ifdef _WIN32
+	cparams_len = WideCharToMultiByte(CP_UTF8, 0,
+		params, -1,
+		0, 0,
+		NULL, NULL);
+	if(!cparams_len) return 0;
+#else
+	cparams_len = wcstombs(0, params, 0)+1;
+#endif
+
+	cparams = malloc(4*(cparams_len));
+	if(!cparams) return 0;
+
+#ifdef _WIN32
+	if(!WideCharToMultiByte(
+		CP_UTF8, 0,
+		params, -1,
+		cparams, cparams_len,
+		NULL, NULL
+	)) {
+		free(cparams);
+
+		return 0;
+	}
+#else
+	wcstombs(cparams, params, cparams_len)+1;
+#endif
+
+	cparams[cparams_len-1] = 0;
+
+	chunk = djvupureRawChunkCreate(incl_sign, cparams, strlen(cparams));
+	free(cparams);
+
+	return chunk;
+}
 
 djvupure_chunk_t * CreateInfoChunkFromParams(wchar_t *params)
 {
@@ -92,6 +139,63 @@ djvupure_chunk_t * CreateInfoChunkFromParams(wchar_t *params)
 	return djvupureInfoCreate(info);
 }
 
+djvupure_chunk_t * CreateRawChunkFromFileOrDjvuDoc(const uint8_t sign[4], wchar_t* chunk_filename)
+{
+	djvupure_io_callback_t io;
+	djvupure_chunk_t *chunk = 0;
+	void *fctx = 0;
+	uint8_t fsign[4];
+
+	djvupureFileSetIoCallbacks(&io);
+
+	fctx = djvupureFileOpenW(chunk_filename, false);
+	if(!fctx) {
+		wprintf(L"Can't open file \"%ls\" for chunk\n", chunk_filename);
+
+		goto FINAL;
+	}
+
+	if(io.callback_read(fctx, fsign, 4) != 4) {
+		wprintf(L"Can't read file \"%ls\" for chunk\n", chunk_filename);
+
+		goto FINAL;
+	}
+
+	if(memcmp(fsign, "AT&T", 4)) {
+		djvupureFileClose(fctx);
+		fctx = 0;
+		chunk = CreateRawChunkFromFile(sign, chunk_filename);
+	} else {
+		djvupure_chunk_t *djvu, *djvu_subchunk;
+
+		djvu = djvupureContainerRead(&io, fctx);
+		if(!djvu) {
+			wprintf(L"Can't read file \"%ls\" for chunk\n", chunk_filename);
+
+			goto FINAL;
+		}
+
+		djvu_subchunk = djvupureContainerGetSubchunkBySign(djvu, sign, 0, 0);
+		
+		if(djvu_subchunk) {
+			void *chunk_data = 0;
+			size_t chunk_data_len;
+
+			djvupureRawChunkGetDataPointer(djvu_subchunk, &chunk_data, &chunk_data_len);
+
+			chunk = djvupureRawChunkCreate(sign, chunk_data, (size_t)chunk_data_len);
+		} else {
+			wprintf(L"Can't find subchunk in file \"%ls\"\n", chunk_filename);
+		}
+
+		djvupureChunkFree(djvu);
+	}
+
+FINAL:
+	if(fctx) djvupureFileClose(fctx);
+
+	return chunk;
+}
 djvupure_chunk_t * CreateRawChunkFromFile(const uint8_t sign[4], wchar_t *chunk_filename)
 {
 	djvupure_io_callback_t io;

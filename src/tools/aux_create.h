@@ -30,7 +30,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "../../include/djvupure.h"
 
+djvupure_chunk_t * CreateInclChunkFromParams(wchar_t *params);
 djvupure_chunk_t * CreateInfoChunkFromParams(wchar_t *params);
+djvupure_chunk_t * CreateRawChunkFromFileOrDjvuDoc(const uint8_t sign[4], wchar_t *chunk_filename);
 djvupure_chunk_t * CreateRawChunkFromFile(const uint8_t sign[4], wchar_t *chunk_filename);
 void CreateIW44ChunkFromFile(djvupure_chunk_t *page, const uint8_t sign[4], wchar_t *chunk_filename, size_t chunks_to_copy);
 

@@ -42,6 +42,8 @@ bool InsertChunkToPage(djvupure_chunk_t *page, const uint8_t sign[4], wchar_t *p
 	
 	if(!memcmp(sign, "INFO", 4)) { // Process INFO chunk
 		chunk = CreateInfoChunkFromParams(param);
+	} else if(!memcmp(sign, "INCL", 4)) {
+		chunk = CreateInclChunkFromParams(param);
 	} else if(!memcmp(sign, "FG44", 4)) { // Process FG44 chunk
 		CreateIW44ChunkFromFile(page, sign, param, 1);
 
@@ -60,6 +62,8 @@ bool InsertChunkToPage(djvupure_chunk_t *page, const uint8_t sign[4], wchar_t *p
 		CreateIW44ChunkFromFile(page, sign, param, n);
 
 		return true;
+	} else if(!memcmp(sign, "Sjbz", 4) || !memcmp(sign, "Smmr", 4)) {
+		chunk = CreateRawChunkFromFileOrDjvuDoc(sign, param);
 	} else { // Process others
 		chunk = CreateRawChunkFromFile(sign, param);
 	}
