@@ -28,6 +28,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "../include/djvupure.h"
 
 #include <stdlib.h>
+#include <string.h>
 
 static const uint8_t djvupure_dir_sign[4] = { 'D', 'I', 'R', 'M' };
 
@@ -164,6 +165,8 @@ DJVUPURE_API bool DJVUPURE_APIENTRY_EXPORT djvupureDirInit(djvupure_chunk_t *dir
 
 			document_offset += djvupureChunkSize(subchunk);
 		}
+
+		free(offsets);
 	}
 
 	// Decode BZ part

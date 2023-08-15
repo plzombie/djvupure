@@ -70,7 +70,7 @@ djvupure_chunk_t * CreateInclChunkFromParams(wchar_t *params)
 		return 0;
 	}
 #else
-	wcstombs(cparams, params, cparams_len)+1;
+	wcstombs(cparams, params, cparams_len);
 #endif
 
 	cparams[cparams_len-1] = 0;
