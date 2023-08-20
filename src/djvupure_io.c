@@ -74,9 +74,9 @@ DJVUPURE_API bool DJVUPURE_APIENTRY_EXPORT djvupureFileOpenU8(uint8_t *fname, bo
 {
 #ifdef _WIN32
 	// Here should be conversion to utf8. Maybe we should convert utf8 to widechar to multibyte for unices too (because multibyte need not be utf8)
-	*fctx = djvupureFileOpenA(fname, write);
+	*fctx = djvupureFileOpenA((char *)fname, write);
 #else
-	*fctx = djvupureFileOpenA(fname, write);
+	*fctx = djvupureFileOpenA((char *)fname, write);
 #endif
 	if(*fctx == 0) return false;
 
