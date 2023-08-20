@@ -23,7 +23,7 @@ djvupurefix: libdjvupure.a djvupurefix.o wmain_stdc.o wtoi.o
 djvupureextract: libdjvupure.a djvupureextract.o wmain_stdc.o wtoi.o
 	$(CC) $(CFLAGS) djvupureextract.o wmain_stdc.o wtoi.o $(LDFLAGS_TOOLS) -o djvupureextract
 
-libdjvupure.a: djvupure_container.o djvupure_core.o djvupure_document.o djvupure_dir.o djvupure_info.o djvupure_io.o djvupure_page.o djvupure_raw.o wfopen.o wcstombsl.o
+libdjvupure.a: djvupure_bgjp.o djvupure_container.o djvupure_core.o djvupure_document.o djvupure_dir.o djvupure_info.o djvupure_io.o djvupure_page.o djvupure_raw.o wfopen.o wcstombsl.o
 	$(AR) rcs libdjvupure.a $^
 
 %.o: ../src/tools/%.c

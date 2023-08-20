@@ -62,7 +62,7 @@ djvupure_chunk_t * CreateInclChunkFromParams(wchar_t *params)
 	if(!WideCharToMultiByte(
 		CP_UTF8, 0,
 		params, -1,
-		cparams, cparams_len,
+		cparams, (int)cparams_len,
 		NULL, NULL
 	)) {
 		free(cparams);

@@ -104,6 +104,12 @@ typedef struct {
 	uint8_t rotation; // 1 - without, 5 - 90deg, 2 - 180deg, 6 - 270deg
 } djvupure_page_info_t;
 
+enum {
+	DJVUPURE_IMAGE_RENDERER_ERROR,
+	DJVUPURE_IMAGE_RENDERER_NEXT_STAGE, // Another stage needed
+	DJVUPURE_IMAGE_RENDERER_LAST_STAGE // Image rendered
+};
+
 #ifdef __cplusplus
 }
 #endif
@@ -147,6 +153,9 @@ DJVUPURE_API bool DJVUPURE_APIENTRY_EXPORT djvupureInfoPut(djvupure_chunk_t *inf
 DJVUPURE_API bool DJVUPURE_APIENTRY_EXPORT djvupurePageCheckSubsign(const uint8_t sign[4]);
 DJVUPURE_API bool DJVUPURE_APIENTRY_EXPORT djvupurePageIs(djvupure_chunk_t *page);
 DJVUPURE_API djvupure_chunk_t * DJVUPURE_APIENTRY_EXPORT djvupurePageCreate(void);
+DJVUPURE_API void * DJVUPURE_APIENTRY_EXPORT djvupurePageImageRendererCreate(djvupure_chunk_t *page, djvupure_chunk_t *document, uint16_t *width, uint16_t *height, uint8_t *channels);
+DJVUPURE_API int DJVUPURE_APIENTRY_EXPORT djvupurePageImageRendererNext(void *image_renderer_ctx, void *image_buffer);
+DJVUPURE_API void DJVUPURE_APIENTRY_EXPORT djvupurePageImageRendererDestroy(void *image_renderer_ctx);
 
 DJVUPURE_API bool DJVUPURE_APIENTRY_EXPORT djvupureDirCheckSign(const uint8_t sign[4]);
 DJVUPURE_API bool DJVUPURE_APIENTRY_EXPORT djvupureDirIs(djvupure_chunk_t *dir);
@@ -161,5 +170,9 @@ DJVUPURE_API bool DJVUPURE_APIENTRY_EXPORT djvupureDocumentRender(djvupure_chunk
 DJVUPURE_API size_t DJVUPURE_APIENTRY_EXPORT djvupureDocumentCountPages(djvupure_chunk_t *document);
 DJVUPURE_API djvupure_chunk_t * DJVUPURE_APIENTRY_EXPORT djvupureDocumentGetPage(djvupure_chunk_t *document, size_t index, djvupure_io_callback_openu8_t openu8, djvupure_io_callback_close_t close);
 DJVUPURE_API bool DJVUPURE_APIENTRY_EXPORT djvupureDocumentPutPage(djvupure_chunk_t *document, djvupure_chunk_t *page, bool changed, djvupure_io_callback_openu8_t openu8, djvupure_io_callback_close_t close);
+
+DJVUPURE_API bool DJVUPURE_APIENTRY_EXPORT djvupureBGjpCheckSign(const uint8_t sign[4]);
+DJVUPURE_API bool DJVUPURE_APIENTRY_EXPORT djvupureBGjpIs(djvupure_chunk_t *dir);
+DJVUPURE_API bool DJVUPURE_APIENTRY_EXPORT djvupureBGjpDecode(djvupure_chunk_t *bgjp, uint16_t width, uint16_t height, void *buf);
 
 #endif

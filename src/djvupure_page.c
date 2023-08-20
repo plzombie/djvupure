@@ -28,6 +28,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "../include/djvupure.h"
 
 #include <string.h>
+#include <stdlib.h>
 
 static const uint8_t djvupure_page_sign[4] = { 'D', 'J', 'V', 'U' };
 
@@ -50,4 +51,65 @@ DJVUPURE_API bool DJVUPURE_APIENTRY_EXPORT djvupurePageIs(djvupure_chunk_t *page
 	if(!djvupureContainerIs(page, djvupure_page_sign)) return false;
 
 	return true;
+}
+
+typedef struct {
+	djvupure_chunk_t *page;
+	djvupure_page_info_t info;
+} djvupure_image_renderer_ctx_t;
+
+DJVUPURE_API void * DJVUPURE_APIENTRY_EXPORT djvupurePageImageRendererCreate(djvupure_chunk_t *page, djvupure_chunk_t *document, uint16_t *width, uint16_t *height, uint8_t *channels)
+{
+	djvupure_image_renderer_ctx_t *ctx;
+	djvupure_chunk_t *info_chunk;
+
+	if(!djvupurePageIs(page)) return 0;
+
+	if(document)
+		if(!djvupureDocumentIs(document)) return 0;
+
+	if(!page) return 0;
+
+	if(!width || !height || !channels) return 0;
+
+	ctx = (djvupure_image_renderer_ctx_t *)malloc(sizeof(djvupure_image_renderer_ctx_t));
+	if(!ctx) return 0;
+
+	info_chunk = djvupureContainerGetSubchunk(page, 0);
+	if(!djvupureInfoIs(info_chunk)) {
+		free(ctx);
+
+		return 0;
+	}
+
+	djvupureInfoGet(info_chunk, &(ctx->info));
+
+	*width = ctx->info.width;
+	*height = ctx->info.height;
+	*channels = 3;
+
+	return ctx;
+}
+
+DJVUPURE_API int DJVUPURE_APIENTRY_EXPORT djvupurePageImageRendererNext(void *image_renderer_ctx, void *image_buffer)
+{
+	djvupure_image_renderer_ctx_t *ctx;
+	uint8_t bgjp_sign[4] = { 'B', 'G', 'j', 'p' };
+	djvupure_chunk_t *bgjp_chunk;
+
+	ctx = (djvupure_image_renderer_ctx_t *)image_renderer_ctx;
+
+	bgjp_chunk = djvupureContainerGetSubchunkBySign(ctx->page, bgjp_sign, 0, 0);
+	if(!bgjp_sign) return DJVUPURE_IMAGE_RENDERER_ERROR;
+
+	if(!djvupureBGjpDecode(bgjp_chunk, ctx->info.width, ctx->info.height, image_buffer)) return DJVUPURE_IMAGE_RENDERER_ERROR;
+
+	return DJVUPURE_IMAGE_RENDERER_LAST_STAGE;
+}
+
+DJVUPURE_API void DJVUPURE_APIENTRY_EXPORT djvupurePageImageRendererDestroy(void *image_renderer_ctx)
+{
+	if(!image_renderer_ctx) return;
+
+	free(image_renderer_ctx);
 }
