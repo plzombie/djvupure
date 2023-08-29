@@ -6,7 +6,7 @@ CFLAGS_OTHER = -O3 -Wall
 LDFLAGS_TOOLS = -L. -ldjvupure -lm
 RM = rm -f
 
-all: djvupuretree djvupuremake djvupureinsert
+all: djvupuretree djvupureinsert djvupuremake djvupurefix djvupureextract djvupuredec
 
 djvupuretree: libdjvupure.a djvupuretree.o wmain_stdc.o
 	$(CC) $(CFLAGS) djvupuretree.o wmain_stdc.o $(LDFLAGS_TOOLS) -o djvupuretree
