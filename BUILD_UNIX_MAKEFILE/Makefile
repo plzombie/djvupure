@@ -3,7 +3,7 @@ CC = gcc
 CFLAGS_TOOLS = -O3 -Wall
 CFLAGS_LIB = -O3 -Wall
 CFLAGS_OTHER = -O3 -Wall
-LDFLAGS_TOOLS = -L. -ldjvupure
+LDFLAGS_TOOLS = -L. -ldjvupure -lm
 RM = rm -f
 
 all: djvupuretree djvupuremake djvupureinsert
