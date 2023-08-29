@@ -27,6 +27,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "../include/djvupure.h"
 
+#define STB_IMAGE_IMPLEMENTATION
+#include "third_party/stb_image.h"
+
 #include <string.h>
 
 static const uint8_t djvupure_bgjp_sign[4] = { 'B', 'G', 'j', 'p' };
@@ -49,10 +52,31 @@ DJVUPURE_API bool DJVUPURE_APIENTRY_EXPORT djvupureBGjpIs(djvupure_chunk_t *dir)
 
 DJVUPURE_API bool DJVUPURE_APIENTRY_EXPORT djvupureBGjpDecode(djvupure_chunk_t *bgjp, uint16_t width, uint16_t height, void *buf)
 {
+	int img_x, img_y, img_comp;
+	void *chunk_data = 0, *img_buf;
+	size_t chunk_data_len = 0;
+
 	if(!djvupureBGjpIs(bgjp)) return false;
 
-	// Here must be decoder
-	memset(buf, 0xf0, (size_t)width*(size_t)height*3);
+	if((SIZE_MAX/3)/width < height) return false;
+
+	djvupureRawChunkGetDataPointer(bgjp, &chunk_data, &chunk_data_len);
+	if(!chunk_data || !chunk_data_len) return false;
+
+	if(chunk_data_len >= INT_MAX) return false;
+
+	img_buf = (void *)stbi_load_from_memory((stbi_uc *)chunk_data, (int)chunk_data_len, &img_x, &img_y, &img_comp, 3);
+	if(!img_buf) return false;
+
+	if(img_x != width || img_y != height) {
+		free(img_buf);
+
+		return false;
+	}
+
+	memcpy(buf, img_buf, (size_t)width*(size_t)height*3);
+
+	free(img_buf);
 
 	return true;
 }

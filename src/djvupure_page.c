@@ -75,6 +75,8 @@ DJVUPURE_API void * DJVUPURE_APIENTRY_EXPORT djvupurePageImageRendererCreate(djv
 	ctx = (djvupure_image_renderer_ctx_t *)malloc(sizeof(djvupure_image_renderer_ctx_t));
 	if(!ctx) return 0;
 
+	ctx->page = page;
+
 	info_chunk = djvupureContainerGetSubchunk(page, 0);
 	if(!djvupureInfoIs(info_chunk)) {
 		free(ctx);
@@ -100,7 +102,7 @@ DJVUPURE_API int DJVUPURE_APIENTRY_EXPORT djvupurePageImageRendererNext(void *im
 	ctx = (djvupure_image_renderer_ctx_t *)image_renderer_ctx;
 
 	bgjp_chunk = djvupureContainerGetSubchunkBySign(ctx->page, bgjp_sign, 0, 0);
-	if(!bgjp_sign) return DJVUPURE_IMAGE_RENDERER_ERROR;
+	if(!bgjp_chunk) return DJVUPURE_IMAGE_RENDERER_ERROR;
 
 	if(!djvupureBGjpDecode(bgjp_chunk, ctx->info.width, ctx->info.height, image_buffer)) return DJVUPURE_IMAGE_RENDERER_ERROR;
 
