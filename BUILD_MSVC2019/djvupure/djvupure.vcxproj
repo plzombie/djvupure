@@ -298,6 +298,7 @@
     <ClCompile Include="..\..\src\djvupure_core.c" />
     <ClCompile Include="..\..\src\djvupure_dir.c" />
     <ClCompile Include="..\..\src\djvupure_document.c" />
+    <ClCompile Include="..\..\src\djvupure_image.c" />
     <ClCompile Include="..\..\src\djvupure_info.c" />
     <ClCompile Include="..\..\src\djvupure_io.c" />
     <ClCompile Include="..\..\src\djvupure_page.c" />

@@ -56,6 +56,8 @@ DJVUPURE_API bool DJVUPURE_APIENTRY_EXPORT djvupurePageIs(djvupure_chunk_t *page
 typedef struct {
 	djvupure_chunk_t *page;
 	djvupure_page_info_t info;
+	uint16_t final_width;
+	uint16_t final_height;
 } djvupure_image_renderer_ctx_t;
 
 DJVUPURE_API void * DJVUPURE_APIENTRY_EXPORT djvupurePageImageRendererCreate(djvupure_chunk_t *page, djvupure_chunk_t *document, uint16_t *width, uint16_t *height, uint8_t *channels)
@@ -86,8 +88,21 @@ DJVUPURE_API void * DJVUPURE_APIENTRY_EXPORT djvupurePageImageRendererCreate(djv
 
 	djvupureInfoGet(info_chunk, &(ctx->info));
 
-	*width = ctx->info.width;
-	*height = ctx->info.height;
+	switch(ctx->info.rotation) {
+		case 5: // 90deg
+		case 6: // 270deg
+			ctx->final_width = ctx->info.height;
+			ctx->final_height = ctx->info.width;
+			break;
+		case 1: // 0deg
+		case 2: // 180deg
+		default:
+			ctx->final_width = ctx->info.width;
+			ctx->final_height = ctx->info.height;
+	}
+
+	*width = ctx->final_width;
+	*height = ctx->final_height;
 	*channels = 3;
 
 	return ctx;
@@ -105,6 +120,8 @@ DJVUPURE_API int DJVUPURE_APIENTRY_EXPORT djvupurePageImageRendererNext(void *im
 	if(!bgjp_chunk) return DJVUPURE_IMAGE_RENDERER_ERROR;
 
 	if(!djvupureBGjpDecode(bgjp_chunk, ctx->info.width, ctx->info.height, image_buffer)) return DJVUPURE_IMAGE_RENDERER_ERROR;
+
+	if(!djvupureImageRotate(ctx->info.width, ctx->info.height, ctx->final_width, ctx->final_height, 3, ctx->info.rotation, (uint8_t *)image_buffer)) return DJVUPURE_IMAGE_RENDERER_ERROR;
 
 	return DJVUPURE_IMAGE_RENDERER_LAST_STAGE;
 }

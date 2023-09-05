@@ -175,4 +175,6 @@ DJVUPURE_API bool DJVUPURE_APIENTRY_EXPORT djvupureBGjpCheckSign(const uint8_t s
 DJVUPURE_API bool DJVUPURE_APIENTRY_EXPORT djvupureBGjpIs(djvupure_chunk_t *dir);
 DJVUPURE_API bool DJVUPURE_APIENTRY_EXPORT djvupureBGjpDecode(djvupure_chunk_t *bgjp, uint16_t width, uint16_t height, void *buf);
 
+DJVUPURE_API bool DJVUPURE_APIENTRY_EXPORT djvupureImageRotate(uint16_t old_width, uint16_t old_height, uint16_t new_width, uint16_t new_height, uint8_t channels, uint8_t rot, uint8_t *buffer);
+
 #endif
