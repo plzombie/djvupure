@@ -70,6 +70,23 @@ DJVUPURE_API bool DJVUPURE_APIENTRY_EXPORT djvupureImageRotate(uint16_t old_widt
 				p2 -= channels;
 			}
 		}
+
+		if(old_height%2 > 0) { // Rotate middle line
+			p1 = buffer+((size_t)old_width*((size_t)old_height/2)*(size_t)channels);
+			p2 = p1+((size_t)old_width*(size_t)channels-channels);
+
+			for(size_t x = 0; x < (size_t)old_width/2; x++) {
+				for(size_t c = 0; c < channels; c++) {
+					uint8_t temp;
+
+					temp = p1[c];
+					p1[c] = p2[c];
+					p2[c] = temp;
+				}
+				p1 += channels;
+				p2 -= channels;
+			}
+		}
 	}
 
 	if(rot == 5) {
