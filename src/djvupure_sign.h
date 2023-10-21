@@ -24,38 +24,37 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
+/*Internal module chunk signatures*/
 
-#include "djvupure_jpeg.h"
-#include "djvupure_sign.h"
+#ifndef DJVUPURE_SIGN_H
+#define DJVUPURE_SIGN_H
 
-#include <string.h>
+#ifdef __cplusplus
+extern "C" {
+#endif
 
-DJVUPURE_API bool DJVUPURE_APIENTRY_EXPORT djvupureBGjpCheckSign(const uint8_t sign[4])
-{
-	if(!memcmp(sign, djvupure_bgjp_sign, 4))
-		return true;
-	else
-		return false;
+#include <stdint.h>
+
+extern const uint8_t djvupure_atnt_sign[4];
+
+extern const uint8_t djvupure_form_sign[4];
+
+extern const uint8_t djvupure_document_sign[4];
+extern const uint8_t djvupure_page_sign[4];
+
+extern const uint8_t djvupure_dir_sign[4];
+
+extern const uint8_t djvupure_info_sign[4];
+
+extern const uint8_t djvupure_bg44_sign[4];
+extern const uint8_t djvupure_bgjp_sign[4];
+extern const uint8_t djvupure_sjbz_sign[4];
+extern const uint8_t djvupure_smmr_sign[4];
+extern const uint8_t djvupure_fg44_sign[4];
+extern const uint8_t djvupure_fgjp_sign[4];
+
+#ifdef __cplusplus
 }
+#endif
 
-DJVUPURE_API bool DJVUPURE_APIENTRY_EXPORT djvupureBGjpIs(djvupure_chunk_t *bgjp)
-{
-	if(djvupureChunkGetStructHash() != bgjp->hash) return false;
-	if(!djvupureBGjpCheckSign(bgjp->sign)) return false;
-
-	return true;
-}
-
-DJVUPURE_API bool DJVUPURE_APIENTRY_EXPORT djvupureBGjpGetInfo(djvupure_chunk_t *bgjp, uint16_t *width, uint16_t *height)
-{
-	if(!djvupureBGjpIs(bgjp)) return false;
-
-	return JpegGetInfo(bgjp, width, height);
-}
-
-DJVUPURE_API bool DJVUPURE_APIENTRY_EXPORT djvupureBGjpDecode(djvupure_chunk_t *bgjp, uint16_t width, uint16_t height, void *buf)
-{
-	if(!djvupureBGjpIs(bgjp)) return false;
-
-	return JpegDecode(bgjp, width, height, buf);
-}
+#endif

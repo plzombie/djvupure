@@ -26,10 +26,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "../include/djvupure.h"
+#include "djvupure_sign.h"
 
 #include <string.h>
 
-static const uint8_t djvupure_info_sign[4] = { 'I', 'N', 'F', 'O' };
 static const size_t djvupure_info_len = 10;
 
 DJVUPURE_API djvupure_chunk_t * DJVUPURE_APIENTRY_EXPORT djvupureInfoCreate(djvupure_page_info_t info)

@@ -26,11 +26,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "../include/djvupure.h"
+#include "djvupure_sign.h"
 
 #include <string.h>
 #include <stdlib.h>
-
-static const uint8_t djvupure_form_sign[4] = { 'F', 'O', 'R', 'M' };
 
 DJVUPURE_API bool DJVUPURE_APIENTRY_EXPORT djvupureContainerCheckSign(const uint8_t sign[4])
 {

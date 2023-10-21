@@ -25,37 +25,22 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include "djvupure_jpeg.h"
 #include "djvupure_sign.h"
 
-#include <string.h>
+const uint8_t djvupure_atnt_sign[4] = { 'A', 'T', '&', 'T' };
 
-DJVUPURE_API bool DJVUPURE_APIENTRY_EXPORT djvupureBGjpCheckSign(const uint8_t sign[4])
-{
-	if(!memcmp(sign, djvupure_bgjp_sign, 4))
-		return true;
-	else
-		return false;
-}
+const uint8_t djvupure_form_sign[4] = { 'F', 'O', 'R', 'M' };
 
-DJVUPURE_API bool DJVUPURE_APIENTRY_EXPORT djvupureBGjpIs(djvupure_chunk_t *bgjp)
-{
-	if(djvupureChunkGetStructHash() != bgjp->hash) return false;
-	if(!djvupureBGjpCheckSign(bgjp->sign)) return false;
+const uint8_t djvupure_document_sign[4] = { 'D', 'J', 'V', 'M' };
+const uint8_t djvupure_page_sign[4] = { 'D', 'J', 'V', 'U' };
 
-	return true;
-}
+const uint8_t djvupure_dir_sign[4] = { 'D', 'I', 'R', 'M' };
 
-DJVUPURE_API bool DJVUPURE_APIENTRY_EXPORT djvupureBGjpGetInfo(djvupure_chunk_t *bgjp, uint16_t *width, uint16_t *height)
-{
-	if(!djvupureBGjpIs(bgjp)) return false;
+const uint8_t djvupure_info_sign[4] = { 'I', 'N', 'F', 'O' };
 
-	return JpegGetInfo(bgjp, width, height);
-}
-
-DJVUPURE_API bool DJVUPURE_APIENTRY_EXPORT djvupureBGjpDecode(djvupure_chunk_t *bgjp, uint16_t width, uint16_t height, void *buf)
-{
-	if(!djvupureBGjpIs(bgjp)) return false;
-
-	return JpegDecode(bgjp, width, height, buf);
-}
+const uint8_t djvupure_bg44_sign[4] = { 'B', 'G', '4', '4' };
+const uint8_t djvupure_bgjp_sign[4] = { 'B', 'G', 'j', 'p' };
+const uint8_t djvupure_sjbz_sign[4] = { 'S', 'j', 'b', 'z' };
+const uint8_t djvupure_smmr_sign[4] = { 'S', 'm', 'm', 'r' };
+const uint8_t djvupure_fg44_sign[4] = { 'F', 'G', '4', '4' };
+const uint8_t djvupure_fgjp_sign[4] = { 'F', 'G', 'j', 'p' };

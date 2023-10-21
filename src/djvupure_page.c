@@ -26,11 +26,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "../include/djvupure.h"
+#include "djvupure_sign.h"
 
 #include <string.h>
 #include <stdlib.h>
-
-static const uint8_t djvupure_page_sign[4] = { 'D', 'J', 'V', 'U' };
 
 DJVUPURE_API djvupure_chunk_t * DJVUPURE_APIENTRY_EXPORT djvupurePageCreate(void)
 {
@@ -124,12 +123,12 @@ DJVUPURE_API void * DJVUPURE_APIENTRY_EXPORT djvupurePageImageRendererCreate(djv
 	ctx->mask = 0;
 	ctx->is_bg_read = false;
 
-	ctx->count_bg44 = djvupureContainerCountSubchunksBySign(page, "BG44", 0);
-	ctx->count_bgjp = djvupureContainerCountSubchunksBySign(page, "BGjp", 0);
-	ctx->count_sjbz = djvupureContainerCountSubchunksBySign(page, "Sjbz", 0);
-	ctx->count_smmr = djvupureContainerCountSubchunksBySign(page, "Smmr", 0);
-	ctx->count_fg44 = djvupureContainerCountSubchunksBySign(page, "FG44", 0);
-	ctx->count_fgjp = djvupureContainerCountSubchunksBySign(page, "FGjp", 0);
+	ctx->count_bg44 = djvupureContainerCountSubchunksBySign(page, djvupure_bg44_sign, 0);
+	ctx->count_bgjp = djvupureContainerCountSubchunksBySign(page, djvupure_bgjp_sign, 0);
+	ctx->count_sjbz = djvupureContainerCountSubchunksBySign(page, djvupure_sjbz_sign, 0);
+	ctx->count_smmr = djvupureContainerCountSubchunksBySign(page, djvupure_smmr_sign, 0);
+	ctx->count_fg44 = djvupureContainerCountSubchunksBySign(page, djvupure_fg44_sign, 0);
+	ctx->count_fgjp = djvupureContainerCountSubchunksBySign(page, djvupure_fgjp_sign, 0);
 
 	if(ctx->count_bg44) ctx->render_status = DJVUPURE_RENDER_STATUS_BG44;
 	else if(ctx->count_bgjp) ctx->render_status = DJVUPURE_RENDER_STATUS_BGjp;
@@ -163,10 +162,9 @@ static void djvupurePageImageRenderBackground(djvupure_image_renderer_ctx_t* ctx
 	}
 
 	if(ctx->render_status == DJVUPURE_RENDER_STATUS_BGjp) {
-		uint8_t bgjp_sign[4] = { 'B', 'G', 'j', 'p' };
 		djvupure_chunk_t *bgjp_chunk;
 
-		bgjp_chunk = djvupureContainerGetSubchunkBySign(ctx->page, bgjp_sign, 0, 0);
+		bgjp_chunk = djvupureContainerGetSubchunkBySign(ctx->page, djvupure_bgjp_sign, 0, 0);
 		if(!bgjp_chunk) {
 			ctx->render_status = DJVUPURE_RENDER_STATUS_ERROR;
 
@@ -209,7 +207,6 @@ static void djvupurePageImageRenderMask(djvupure_image_renderer_ctx_t *ctx, void
 	}
 
 	if(ctx->render_status == DJVUPURE_RENDER_STATUS_Smmr) {
-		uint8_t smmr_sign[4] = { 'S', 'm', 'm', 'r' };
 		void *smmr_buffer;
 		djvupure_chunk_t *smmr_chunk;
 
@@ -228,7 +225,7 @@ static void djvupurePageImageRenderMask(djvupure_image_renderer_ctx_t *ctx, void
 			smmr_buffer = ctx->mask;
 		} else smmr_buffer = image_buffer;
 
-		smmr_chunk = djvupureContainerGetSubchunkBySign(ctx->page, smmr_sign, 0, 0);
+		smmr_chunk = djvupureContainerGetSubchunkBySign(ctx->page, djvupure_smmr_sign, 0, 0);
 		if(!smmr_chunk) {
 			ctx->render_status = DJVUPURE_RENDER_STATUS_ERROR;
 
@@ -303,11 +300,9 @@ static void djvupurePageImageRenderForeground(djvupure_image_renderer_ctx_t* ctx
 		}
 	
 		if(ctx->render_status == DJVUPURE_RENDER_STATUS_FGjp) {
-			uint8_t fgjp_sign[4] = { 'F', 'G', 'j', 'p' };
-
 			djvupure_chunk_t *fgjp_chunk;
 
-			fgjp_chunk = djvupureContainerGetSubchunkBySign(ctx->page, fgjp_sign, 0, 0);
+			fgjp_chunk = djvupureContainerGetSubchunkBySign(ctx->page, djvupure_fgjp_sign, 0, 0);
 			if(!fgjp_chunk) {
 				ctx->render_status = DJVUPURE_RENDER_STATUS_ERROR;
 

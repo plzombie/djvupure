@@ -26,11 +26,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "../include/djvupure.h"
+#include "djvupure_sign.h"
 
 #include <string.h>
-
-static const uint8_t djvupure_document_sign[4] = { 'D', 'J', 'V', 'M' };
-static const uint8_t djvupure_page_sign[4] = { 'D', 'J', 'V', 'U' };
 
 DJVUPURE_API bool DJVUPURE_APIENTRY_EXPORT djvupureDocumentIs(djvupure_chunk_t *document)
 {
@@ -42,11 +40,11 @@ DJVUPURE_API bool DJVUPURE_APIENTRY_EXPORT djvupureDocumentIs(djvupure_chunk_t *
 
 DJVUPURE_API djvupure_chunk_t * DJVUPURE_APIENTRY_EXPORT djvupureDocumentRead(djvupure_io_callback_t *io, void *fctx)
 {
-	uint8_t atnt_sign[4] = { 'A', 'T', '&', 'T' }, sign[4];
+	uint8_t sign[4];
 	djvupure_chunk_t *document;
 	
 	if(io->callback_read(fctx, sign, 4) != 4) return 0;
-	if(memcmp(sign, atnt_sign, 4)) return 0;
+	if(memcmp(sign, djvupure_atnt_sign, 4)) return 0;
 	
 	document = djvupureContainerRead(io, fctx);
 	if(!document) return 0;
@@ -79,9 +77,7 @@ DJVUPURE_API djvupure_chunk_t * DJVUPURE_APIENTRY_EXPORT djvupureDocumentRead(dj
 
 DJVUPURE_API bool DJVUPURE_APIENTRY_EXPORT djvupureDocumentRender(djvupure_chunk_t *chunk, djvupure_io_callback_t *io, void *fctx)
 {
-	uint8_t atnt_sign[4] = { 'A', 'T', '&', 'T' };
-	
-	if(io->callback_write(fctx, atnt_sign, 4) != 4) return false;
+	if(io->callback_write(fctx, djvupure_atnt_sign, 4) != 4) return false;
 
 	return djvupureChunkRender(chunk, io, fctx);
 }

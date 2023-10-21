@@ -26,10 +26,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "djvupure_jpeg.h"
+#include "djvupure_sign.h"
 
 #include <string.h>
-
-static const uint8_t djvupure_fgjp_sign[4] = { 'F', 'G', 'j', 'p' };
 
 DJVUPURE_API bool DJVUPURE_APIENTRY_EXPORT djvupureFGjpCheckSign(const uint8_t sign[4])
 {

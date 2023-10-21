@@ -26,6 +26,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "../include/djvupure.h"
+#include "djvupure_sign.h"
 
 #include <string.h>
 
@@ -34,8 +35,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #define MMR_FLAGS_DATA_IN_STRIPES MMR_FLAGS_S
 #define MMR_FLAGS_MIN_IS_BLACK MMR_FLAGS_I
-
-static const uint8_t djvupure_smmr_sign[4] = { 'S', 'm', 'm', 'r' };
 
 DJVUPURE_API bool DJVUPURE_APIENTRY_EXPORT djvupureSmmrCheckSign(const uint8_t sign[4])
 {

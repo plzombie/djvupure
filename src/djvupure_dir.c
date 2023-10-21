@@ -26,11 +26,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "../include/djvupure.h"
+#include "djvupure_sign.h"
 
 #include <stdlib.h>
 #include <string.h>
-
-static const uint8_t djvupure_dir_sign[4] = { 'D', 'I', 'R', 'M' };
 
 enum {
 	DJVUPURE_DIR_FILE_TYPE_SHARED = 0,

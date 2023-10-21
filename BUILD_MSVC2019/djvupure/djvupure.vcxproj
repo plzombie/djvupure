@@ -305,6 +305,7 @@
     <ClCompile Include="..\..\src\djvupure_jpeg.c" />
     <ClCompile Include="..\..\src\djvupure_page.c" />
     <ClCompile Include="..\..\src\djvupure_raw.c" />
+    <ClCompile Include="..\..\src\djvupure_sign.c" />
     <ClCompile Include="..\..\src\djvupure_smmr.c" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

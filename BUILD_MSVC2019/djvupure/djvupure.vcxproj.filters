@@ -54,5 +54,8 @@
     <ClCompile Include="..\..\src\djvupure_jpeg.c">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\djvupure_sign.c">
+      <Filter>Исходные файлы</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>
