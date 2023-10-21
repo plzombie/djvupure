@@ -37,6 +37,7 @@ int wmain(int argc, wchar_t **argv)
 {
 	djvupure_io_callback_t io;
 	djvupure_chunk_t *page;
+	size_t nof_chunks;
 	void *fctx = 0;
 	int result = EXIT_FAILURE;
 
@@ -55,6 +56,8 @@ int wmain(int argc, wchar_t **argv)
 			L"\tfor INFO chunk there are special parameters \"INFO=width,height,dpi,rotation,gamma\", some parameters can be empty\n"
 			L"\t\trotation 1 is 0deg, 5 - 90deg, 2 - 180deg, 6 - 270deg\n"
 			L"\t\tgamma 22 stands for gamma value 2.2\n"
+			L"\t\tIf no chunk presented it will be generated from the following chunks in following order\n"
+			L"\t\t\tSjbz, Smmr, BG44, BGjp\n"
 			L"\tfor other chunks parameter is a path to a file containing chunk data (i.e. \"Sjbz=page.sjbz\")\n"
 			L"\tChunks FG44 and BG44 should be a IFF85 file with a group of PM44 subchunks (can be created with extract utility)\n"
 			L"\t\tchunk FG44 extracts only one PM44 chunk from file\n"
@@ -91,6 +94,65 @@ int wmain(int argc, wchar_t **argv)
 		
 		if(!InsertChunkToPage(page, sign, chunk_filename))
 			wprintf(L"Can't append chunk %.4hs\n", sign);
+	}
+
+	// Check if INFO chunk existed. If not - generate it
+	nof_chunks = djvupureContainerSize(page);
+
+	if(djvupureContainerFindSubchunkBySign(page, "INFO", 0, 0) == nof_chunks) {
+		djvupure_page_info_t info;
+		djvupure_chunk_t *info_chunk;
+		bool info_found = false;
+		size_t chunk_no;
+
+		if((chunk_no = djvupureContainerFindSubchunkBySign(page, "Sjbz", 0, 0)) != nof_chunks) {
+			wprintf(L"Generate INFO chunk: Found Sjbz chunk, but it is unsupported\n");
+		}
+		if(!info_found && (chunk_no = djvupureContainerFindSubchunkBySign(page, "Smmr", 0, 0)) != nof_chunks) {
+			djvupure_chunk_t *smmr;
+
+			smmr = djvupureContainerGetSubchunk(page, chunk_no);
+
+			if(smmr) {
+				if(!djvupureSmmrGetInfo(smmr, &(info.width), &(info.height)))
+					wprintf(L"Generate INFO chunk: Can't get info from Smmr chunk\n");
+				else
+					info_found = true;
+			} else {
+				wprintf(L"Generate INFO chunk: Can't retrieve Smmr chunk\n");
+			}
+		}
+		if(!info_found && (chunk_no = djvupureContainerFindSubchunkBySign(page, "BG44", 0, 0)) != nof_chunks) {
+			wprintf(L"Generate INFO chunk: Found BG44 chunk, but it is unsupported\n");
+		}
+		if(!info_found && (chunk_no = djvupureContainerFindSubchunkBySign(page, "BGjp", 0, 0)) != nof_chunks) {
+			djvupure_chunk_t *bgjp;
+
+			bgjp = djvupureContainerGetSubchunk(page, chunk_no);
+
+			if(bgjp) {
+				if(!djvupureBGjpGetInfo(bgjp, &(info.width), &(info.height)))
+					wprintf(L"Generate INFO chunk: Can't get info from BGjp chunk\n");
+				else
+					info_found = true;
+			} else {
+				wprintf(L"Generate INFO chunk: Can't retrieve BGjp chunk\n");
+			}
+		}
+
+		if(info_found) {
+			info.dpi = 300; 
+			info.gamma = 22;
+			info.rotation = 1;
+
+			info_chunk = djvupureInfoCreate(info);
+			if(info_chunk) {
+				if(!djvupureContainerInsertChunk(page, info_chunk, 0))
+					wprintf(L"Can't insert default INFO chunk\n");
+			} else
+				wprintf(L"Can't create default INFO chunk\n");
+		} else
+			wprintf(L"No INFO chunk generated\n");
 	}
 
 	fctx = djvupureFileOpenW(argv[1], true);

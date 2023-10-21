@@ -298,11 +298,14 @@
     <ClCompile Include="..\..\src\djvupure_core.c" />
     <ClCompile Include="..\..\src\djvupure_dir.c" />
     <ClCompile Include="..\..\src\djvupure_document.c" />
+    <ClCompile Include="..\..\src\djvupure_fgjp.c" />
     <ClCompile Include="..\..\src\djvupure_image.c" />
     <ClCompile Include="..\..\src\djvupure_info.c" />
     <ClCompile Include="..\..\src\djvupure_io.c" />
+    <ClCompile Include="..\..\src\djvupure_jpeg.c" />
     <ClCompile Include="..\..\src\djvupure_page.c" />
     <ClCompile Include="..\..\src\djvupure_raw.c" />
+    <ClCompile Include="..\..\src\djvupure_smmr.c" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

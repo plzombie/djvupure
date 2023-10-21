@@ -24,39 +24,22 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
+/*Internal module for JPEG decoding*/
 
-#include "djvupure_jpeg.h"
+#ifndef DJVUPURE_JPEG_H
+#define DJVUPURE_JPEG_H
 
-#include <string.h>
+#ifdef __cplusplus
+extern "C" {
+#endif
 
-static const uint8_t djvupure_bgjp_sign[4] = { 'B', 'G', 'j', 'p' };
+#include "../include/djvupure.h"
 
-DJVUPURE_API bool DJVUPURE_APIENTRY_EXPORT djvupureBGjpCheckSign(const uint8_t sign[4])
-{
-	if(!memcmp(sign, djvupure_bgjp_sign, 4))
-		return true;
-	else
-		return false;
+bool DJVUPURE_APIENTRY JpegGetInfo(djvupure_chunk_t *jpeg, uint16_t *width, uint16_t *height);
+bool DJVUPURE_APIENTRY JpegDecode(djvupure_chunk_t *jpeg, uint16_t width, uint16_t height, void *buf);
+
+#ifdef __cplusplus
 }
+#endif
 
-DJVUPURE_API bool DJVUPURE_APIENTRY_EXPORT djvupureBGjpIs(djvupure_chunk_t *bgjp)
-{
-	if(djvupureChunkGetStructHash() != bgjp->hash) return false;
-	if(!djvupureBGjpCheckSign(bgjp->sign)) return false;
-
-	return true;
-}
-
-DJVUPURE_API bool DJVUPURE_APIENTRY_EXPORT djvupureBGjpGetInfo(djvupure_chunk_t *bgjp, uint16_t *width, uint16_t *height)
-{
-	if(!djvupureBGjpIs(bgjp)) return false;
-
-	return JpegGetInfo(bgjp, width, height);
-}
-
-DJVUPURE_API bool DJVUPURE_APIENTRY_EXPORT djvupureBGjpDecode(djvupure_chunk_t *bgjp, uint16_t width, uint16_t height, void *buf)
-{
-	if(!djvupureBGjpIs(bgjp)) return false;
-
-	return JpegDecode(bgjp, width, height, buf);
-}
+#endif

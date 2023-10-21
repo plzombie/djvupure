@@ -29,34 +29,32 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <string.h>
 
-static const uint8_t djvupure_bgjp_sign[4] = { 'B', 'G', 'j', 'p' };
+static const uint8_t djvupure_fgjp_sign[4] = { 'F', 'G', 'j', 'p' };
 
-DJVUPURE_API bool DJVUPURE_APIENTRY_EXPORT djvupureBGjpCheckSign(const uint8_t sign[4])
+DJVUPURE_API bool DJVUPURE_APIENTRY_EXPORT djvupureFGjpCheckSign(const uint8_t sign[4])
 {
-	if(!memcmp(sign, djvupure_bgjp_sign, 4))
+	if(!memcmp(sign, djvupure_fgjp_sign, 4))
 		return true;
 	else
 		return false;
 }
 
-DJVUPURE_API bool DJVUPURE_APIENTRY_EXPORT djvupureBGjpIs(djvupure_chunk_t *bgjp)
+DJVUPURE_API bool DJVUPURE_APIENTRY_EXPORT djvupureFGjpIs(djvupure_chunk_t *fgjp)
 {
-	if(djvupureChunkGetStructHash() != bgjp->hash) return false;
-	if(!djvupureBGjpCheckSign(bgjp->sign)) return false;
+	if(djvupureChunkGetStructHash() != fgjp->hash) return false;
+	if(!djvupureFGjpCheckSign(fgjp->sign)) return false;
 
 	return true;
 }
 
-DJVUPURE_API bool DJVUPURE_APIENTRY_EXPORT djvupureBGjpGetInfo(djvupure_chunk_t *bgjp, uint16_t *width, uint16_t *height)
+DJVUPURE_API bool DJVUPURE_APIENTRY_EXPORT djvupureFGjpGetInfo(djvupure_chunk_t *fgjp, uint16_t *width, uint16_t *height)
 {
-	if(!djvupureBGjpIs(bgjp)) return false;
+	if(!djvupureFGjpIs(fgjp)) return false;
 
-	return JpegGetInfo(bgjp, width, height);
+	return JpegGetInfo(fgjp, width, height);
 }
 
-DJVUPURE_API bool DJVUPURE_APIENTRY_EXPORT djvupureBGjpDecode(djvupure_chunk_t *bgjp, uint16_t width, uint16_t height, void *buf)
+DJVUPURE_API bool DJVUPURE_APIENTRY_EXPORT djvupureFGjpDecode(djvupure_chunk_t *fgjp, uint16_t width, uint16_t height, void *buf)
 {
-	if(!djvupureBGjpIs(bgjp)) return false;
-
-	return JpegDecode(bgjp, width, height, buf);
+	return JpegDecode(fgjp, width, height, buf);
 }

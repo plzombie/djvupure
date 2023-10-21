@@ -110,10 +110,6 @@ enum {
 	DJVUPURE_IMAGE_RENDERER_LAST_STAGE // Image rendered
 };
 
-#ifdef __cplusplus
-}
-#endif
-
 DJVUPURE_API void DJVUPURE_APIENTRY_EXPORT djvupureGetVersion(uint32_t *major, uint32_t *minor, uint32_t *revision);
 
 DJVUPURE_API uint32_t DJVUPURE_APIENTRY_EXPORT djvupureChunkGetStructHash(void);
@@ -171,10 +167,26 @@ DJVUPURE_API size_t DJVUPURE_APIENTRY_EXPORT djvupureDocumentCountPages(djvupure
 DJVUPURE_API djvupure_chunk_t * DJVUPURE_APIENTRY_EXPORT djvupureDocumentGetPage(djvupure_chunk_t *document, size_t index, djvupure_io_callback_openu8_t openu8, djvupure_io_callback_close_t close);
 DJVUPURE_API bool DJVUPURE_APIENTRY_EXPORT djvupureDocumentPutPage(djvupure_chunk_t *document, djvupure_chunk_t *page, bool changed, djvupure_io_callback_openu8_t openu8, djvupure_io_callback_close_t close);
 
+DJVUPURE_API bool DJVUPURE_APIENTRY_EXPORT djvupureSmmrCheckSign(const uint8_t sign[4]);
+DJVUPURE_API bool DJVUPURE_APIENTRY_EXPORT djvupureSmmrIs(djvupure_chunk_t *dir);
+DJVUPURE_API bool DJVUPURE_APIENTRY_EXPORT djvupureSmmrGetInfo(djvupure_chunk_t *smmr, uint16_t *width, uint16_t *height);
+DJVUPURE_API bool DJVUPURE_APIENTRY_EXPORT djvupureSmmrDecode(djvupure_chunk_t *smmr, uint16_t width, uint16_t height, void* buf);
+
+DJVUPURE_API bool DJVUPURE_APIENTRY_EXPORT djvupureFGjpCheckSign(const uint8_t sign[4]);
+DJVUPURE_API bool DJVUPURE_APIENTRY_EXPORT djvupureFGjpIs(djvupure_chunk_t *dir);
+DJVUPURE_API bool DJVUPURE_APIENTRY_EXPORT djvupureFGjpGetInfo(djvupure_chunk_t *fgjp, uint16_t *width, uint16_t *height);
+DJVUPURE_API bool DJVUPURE_APIENTRY_EXPORT djvupureFGjpDecode(djvupure_chunk_t *fgjp, uint16_t width, uint16_t height, void *buf);
+
 DJVUPURE_API bool DJVUPURE_APIENTRY_EXPORT djvupureBGjpCheckSign(const uint8_t sign[4]);
 DJVUPURE_API bool DJVUPURE_APIENTRY_EXPORT djvupureBGjpIs(djvupure_chunk_t *dir);
+DJVUPURE_API bool DJVUPURE_APIENTRY_EXPORT djvupureBGjpGetInfo(djvupure_chunk_t *bgjp, uint16_t *width, uint16_t *height);
 DJVUPURE_API bool DJVUPURE_APIENTRY_EXPORT djvupureBGjpDecode(djvupure_chunk_t *bgjp, uint16_t width, uint16_t height, void *buf);
 
 DJVUPURE_API bool DJVUPURE_APIENTRY_EXPORT djvupureImageRotate(uint16_t old_width, uint16_t old_height, uint16_t new_width, uint16_t new_height, uint8_t channels, uint8_t rot, uint8_t *buffer);
+DJVUPURE_API bool DJVUPURE_APIENTRY_EXPORT djvupureImageResizeFine(uint16_t old_width, uint16_t old_height, const uint8_t *old_buffer, uint16_t new_width, uint16_t new_height, uint8_t *new_buffer, uint8_t channels);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

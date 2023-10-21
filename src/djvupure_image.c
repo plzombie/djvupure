@@ -27,6 +27,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "../include/djvupure.h"
 
+#define STB_IMAGE_RESIZE_IMPLEMENTATION
+#include "third_party/stb_image_resize.h"
+
 #include <string.h>
 #include <stdlib.h>
 
@@ -132,3 +135,16 @@ DJVUPURE_API bool DJVUPURE_APIENTRY_EXPORT djvupureImageRotate(uint16_t old_widt
 
 	return true;
 }
+
+DJVUPURE_API bool DJVUPURE_APIENTRY_EXPORT djvupureImageResizeFine(uint16_t old_width, uint16_t old_height, const uint8_t *old_buffer, uint16_t new_width, uint16_t new_height, uint8_t *new_buffer, uint8_t channels)
+{
+	int ret;
+
+	ret = stbir_resize_uint8(
+		old_buffer, old_width, old_height, 0,
+		new_buffer, new_width, new_height, 0,
+		channels);
+
+	return ret?true:false;
+}
+
