@@ -24,5 +24,8 @@
     <ClCompile Include="..\..\src\tools\aux_insert.c">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\djvupure_sign.c">
+      <Filter>Исходные файлы</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

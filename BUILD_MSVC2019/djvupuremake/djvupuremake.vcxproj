@@ -269,6 +269,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\src\djvupure_sign.c" />
     <ClCompile Include="..\..\src\tools\aux_create.c" />
     <ClCompile Include="..\..\src\tools\aux_insert.c" />
     <ClCompile Include="..\..\src\tools\djvupuremake.c" />

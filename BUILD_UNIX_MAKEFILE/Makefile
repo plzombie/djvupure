@@ -15,7 +15,7 @@ djvupureinsert: libdjvupure.a djvupureinsert.o aux_create.o aux_insert.o wmain_s
 	$(CC) $(CFLAGS) djvupureinsert.o aux_create.o aux_insert.o wmain_stdc.o wtoi.o $(LDFLAGS_TOOLS) -o djvupureinsert
 
 djvupuremake: libdjvupure.a djvupuremake.o aux_create.o aux_insert.o wmain_stdc.o wtoi.o
-	$(CC) $(CFLAGS) djvupuremake.o aux_create.o aux_insert.o wmain_stdc.o wtoi.o $(LDFLAGS_TOOLS) -o djvupuremake
+	$(CC) $(CFLAGS) djvupuremake.o djvupure_sign.o aux_create.o aux_insert.o wmain_stdc.o wtoi.o $(LDFLAGS_TOOLS) -o djvupuremake
 
 djvupurefix: libdjvupure.a djvupurefix.o wmain_stdc.o wtoi.o
 	$(CC) $(CFLAGS) djvupurefix.o wmain_stdc.o wtoi.o $(LDFLAGS_TOOLS) -o djvupurefix

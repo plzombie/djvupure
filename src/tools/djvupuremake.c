@@ -26,6 +26,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "../../include/djvupure.h"
+#include "../../src/djvupure_sign.h"
 #include "aux_insert.h"
 
 #include <stdio.h>
@@ -99,16 +100,16 @@ int wmain(int argc, wchar_t **argv)
 	// Check if INFO chunk existed. If not - generate it
 	nof_chunks = djvupureContainerSize(page);
 
-	if(djvupureContainerFindSubchunkBySign(page, "INFO", 0, 0) == nof_chunks) {
+	if(djvupureContainerFindSubchunkBySign(page, djvupure_info_sign, 0, 0) == nof_chunks) {
 		djvupure_page_info_t info;
 		djvupure_chunk_t *info_chunk;
 		bool info_found = false;
 		size_t chunk_no;
 
-		if((chunk_no = djvupureContainerFindSubchunkBySign(page, "Sjbz", 0, 0)) != nof_chunks) {
+		if((chunk_no = djvupureContainerFindSubchunkBySign(page, djvupure_sjbz_sign, 0, 0)) != nof_chunks) {
 			wprintf(L"Generate INFO chunk: Found Sjbz chunk, but it is unsupported\n");
 		}
-		if(!info_found && (chunk_no = djvupureContainerFindSubchunkBySign(page, "Smmr", 0, 0)) != nof_chunks) {
+		if(!info_found && (chunk_no = djvupureContainerFindSubchunkBySign(page, djvupure_smmr_sign, 0, 0)) != nof_chunks) {
 			djvupure_chunk_t *smmr;
 
 			smmr = djvupureContainerGetSubchunk(page, chunk_no);
@@ -122,10 +123,10 @@ int wmain(int argc, wchar_t **argv)
 				wprintf(L"Generate INFO chunk: Can't retrieve Smmr chunk\n");
 			}
 		}
-		if(!info_found && (chunk_no = djvupureContainerFindSubchunkBySign(page, "BG44", 0, 0)) != nof_chunks) {
+		if(!info_found && (chunk_no = djvupureContainerFindSubchunkBySign(page, djvupure_bg44_sign, 0, 0)) != nof_chunks) {
 			wprintf(L"Generate INFO chunk: Found BG44 chunk, but it is unsupported\n");
 		}
-		if(!info_found && (chunk_no = djvupureContainerFindSubchunkBySign(page, "BGjp", 0, 0)) != nof_chunks) {
+		if(!info_found && (chunk_no = djvupureContainerFindSubchunkBySign(page, djvupure_bgjp_sign, 0, 0)) != nof_chunks) {
 			djvupure_chunk_t *bgjp;
 
 			bgjp = djvupureContainerGetSubchunk(page, chunk_no);
