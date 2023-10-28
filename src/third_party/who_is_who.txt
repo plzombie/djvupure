@@ -1,0 +1,3 @@
+stb:
+- stb_image.h
+- stb_image_resize.h

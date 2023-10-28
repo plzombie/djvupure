@@ -26,10 +26,13 @@ djvupureextract: libdjvupure.a djvupureextract.o wmain_stdc.o wtoi.o
 djvupuredec: libdjvupure.a djvupuredec.o ppm_save.o wmain_stdc.o wtoi.o
 	$(CC) $(CFLAGS) djvupuredec.o ppm_save.o wmain_stdc.o wtoi.o $(LDFLAGS_TOOLS) -o djvupuredec
 	
-libdjvupure.a: djvupure_bgjp.o djvupure_container.o djvupure_core.o djvupure_dir.o djvupure_document.o djvupure_fgjp.o djvupure_image.o djvupure_info.o djvupure_io.o djvupure_jpeg.o djvupure_page.o djvupure_raw.o djvupure_sign.o djvupure_smmr.o wfopen.o wcstombsl.o
+libdjvupure.a: ccitg4mmr.o djvupure_bgjp.o djvupure_container.o djvupure_core.o djvupure_dir.o djvupure_document.o djvupure_fgjp.o djvupure_image.o djvupure_info.o djvupure_io.o djvupure_jpeg.o djvupure_page.o djvupure_raw.o djvupure_sign.o djvupure_smmr.o wfopen.o wcstombsl.o
 	$(AR) rcs libdjvupure.a $^
 
 %.o: ../src/tools/%.c
+	$(CC) -c $(CFLAGS_TOOLS) $< -o $@
+
+%.o: ../src/ccitg4mmr/%.c
 	$(CC) -c $(CFLAGS_TOOLS) $< -o $@
 
 %.o: ../src/all2ppm/src/%.c

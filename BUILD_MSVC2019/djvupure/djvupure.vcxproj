@@ -293,6 +293,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\src\ccitg4mmr\src\ccitg4mmr.c" />
     <ClCompile Include="..\..\src\djvupure_bgjp.c" />
     <ClCompile Include="..\..\src\djvupure_container.c" />
     <ClCompile Include="..\..\src\djvupure_core.c" />

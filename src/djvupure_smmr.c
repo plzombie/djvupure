@@ -26,6 +26,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "../include/djvupure.h"
+#include "ccitg4mmr/include/ccitg4mmr.h"
 #include "djvupure_sign.h"
 
 #include <string.h>

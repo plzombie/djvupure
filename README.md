@@ -3,7 +3,7 @@ Rewriting djvulibre without GNU GPL stuff
 
 ## Dependencies
 
-* [stb](https://github.com/nothings/stb) - [Unlicense/MIT](https://github.com/nothings/stb/blob/master/LICENSE)
+* [stb](https://github.com/nothings/stb) - [Unlicense/MIT](LICENSE_stb.txt)
 
 ## Competitors
 * [DjvuNet](https://github.com/DjvuNet/DjvuNet) - C#, MIT
