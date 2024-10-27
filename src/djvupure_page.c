@@ -154,7 +154,7 @@ DJVUPURE_API void * DJVUPURE_APIENTRY_EXPORT djvupurePageImageRendererCreate(djv
 	return ctx;
 }
 
-static void djvupurePageImageRenderBackground(djvupure_image_renderer_ctx_t* ctx, void* image_buffer)
+static void djvupurePageImageRenderBackground(djvupure_image_renderer_ctx_t *ctx, void *image_buffer)
 {
 	if(ctx->render_status == DJVUPURE_RENDER_STATUS_BG44) {
 		// We don't have support for now
@@ -264,10 +264,10 @@ static void djvupurePageImageRenderMask(djvupure_image_renderer_ctx_t *ctx, void
 	}
 }
 
-static void djvupurePageImageRenderForeground(djvupure_image_renderer_ctx_t* ctx, void* image_buffer)
+static void djvupurePageImageRenderForeground(djvupure_image_renderer_ctx_t *ctx, void *image_buffer)
 {
 	if(ctx->render_status == DJVUPURE_RENDER_STATUS_FG44 || ctx->render_status == DJVUPURE_RENDER_STATUS_FGjp) {
-		uint8_t *fg_buffer;
+		uint8_t *fg_buffer = 0;
 		bool is_fg_read = false;
 
 		if(SIZE_MAX/ctx->final_width < 3) {
@@ -306,19 +306,19 @@ static void djvupurePageImageRenderForeground(djvupure_image_renderer_ctx_t* ctx
 			if(!fgjp_chunk) {
 				ctx->render_status = DJVUPURE_RENDER_STATUS_ERROR;
 
-				return;
+				goto FINAL;
 			}
 
 			if(!djvupureFGjpDecode(fgjp_chunk, ctx->info.width, ctx->info.height, fg_buffer)) {
 				ctx->render_status = DJVUPURE_RENDER_STATUS_ERROR;
 
-				return;
+				goto FINAL;
 			}
 
 			if(!djvupureImageRotate(ctx->info.width, ctx->info.height, ctx->final_width, ctx->final_height, 3, ctx->info.rotation, fg_buffer)) {
 				ctx->render_status = DJVUPURE_RENDER_STATUS_ERROR;
 
-				return;
+				goto FINAL;
 			}
 
 			is_fg_read = true;
@@ -347,11 +347,16 @@ static void djvupurePageImageRenderForeground(djvupure_image_renderer_ctx_t* ctx
 				}
 
 			ctx->render_status = DJVUPURE_RENDER_STATUS_LAST;
-
-			free(fg_buffer);
-
-			return;
 		}
+
+	FINAL:
+		if(fg_buffer) free(fg_buffer);
+		if(ctx->mask) {
+			free(ctx->mask);
+			ctx->mask = 0;
+		}
+
+		return;
 	}
 }
 
