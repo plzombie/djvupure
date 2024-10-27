@@ -56,7 +56,7 @@ bool DJVUPURE_APIENTRY JpegGetInfo(djvupure_chunk_t *jpeg, uint16_t *width, uint
 bool DJVUPURE_APIENTRY JpegDecode(djvupure_chunk_t *jpeg, uint16_t width, uint16_t height, void *buf)
 {
 	int img_x, img_y, img_comp;
-	void *chunk_data = 0, *img_buf;
+	void *chunk_data = 0, *img_buf = 0;
 	size_t chunk_data_len = 0;
 	bool result = false;
 
@@ -76,11 +76,11 @@ bool DJVUPURE_APIENTRY JpegDecode(djvupure_chunk_t *jpeg, uint16_t width, uint16
 	} else
 		memcpy(buf, img_buf, (size_t)width* (size_t)height * 3);
 
-	free(img_buf);
-
 	result = true;
 
 FINAL:
+
+	if(img_buf) free(img_buf);
 
 	return result;
 }
